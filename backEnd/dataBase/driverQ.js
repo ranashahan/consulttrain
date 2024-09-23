@@ -216,7 +216,8 @@ const driverDeleteByID = async (id) => {
  * @returns {result} result
  */
 const driversAll = async () => {
-  const query = "select * from driver where active=1";
+  const query =
+    "select * from driver where active=1 order by created_at desc limit 100";
   // const query = "CALL `consulttrain`.`getAllDrivers`();";
   try {
     const client = await pool.pool.getConnection();
