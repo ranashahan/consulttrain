@@ -161,11 +161,12 @@ const driverUpdateByID = async (
   permitexpiry,
   bloodgroupid,
   contractorid,
+  formcount,
   userid,
   id
 ) => {
   const query =
-    "UPDATE driver SET name=?,dob=?,nic=?,licensenumber=?,licensetypeid=?,licenseexpiry=?,designation=?,department=?,permitnumber=?,permitissue=?,permitexpiry=?,bloodgroupid=?,contractorid=?, modifiedby=? where id=?";
+    "UPDATE driver SET name=?,dob=?,nic=?,licensenumber=?,licensetypeid=?,licenseexpiry=?,designation=?,department=?,permitnumber=?,permitissue=?,permitexpiry=?,bloodgroupid=?,contractorid=?,formcount=?, modifiedby=? where id=?";
 
   try {
     const client = await pool.pool.getConnection();
@@ -183,6 +184,7 @@ const driverUpdateByID = async (
       permitexpiry,
       bloodgroupid,
       contractorid,
+      formcount,
       userid,
       id,
     ]);
