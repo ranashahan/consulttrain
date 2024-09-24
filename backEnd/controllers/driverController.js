@@ -232,6 +232,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
+      formcount,
       userid,
     } = req.body;
     if (!id) {
@@ -259,6 +260,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
+      formcount,
       userid,
       id
     );
