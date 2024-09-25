@@ -114,14 +114,14 @@ const driverFindByLicense = async (licensenumber) => {
  * @returns {result} result
  */
 const driverFindByID = async (id) => {
-  const query = "select * from driver where id=? and active=1 limit 1";
-  // const query = "CALL `consulttrain`.`getDriverByID`(?);";
+  // const query = "select * from driver where id=? and active=1 limit 1";
+  const query = "CALL `consulttrain`.`getDriverByID`(?);";
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
-    // return result[0][0];
-    return result[0];
+    return result[0][0];
+    // return result[0];
   } catch (error) {
     console.log("error occurred while driver find by id");
     return error;
@@ -161,12 +161,13 @@ const driverUpdateByID = async (
   permitexpiry,
   bloodgroupid,
   contractorid,
-  formcount,
+  ddccount,
+  experience,
   userid,
   id
 ) => {
   const query =
-    "UPDATE driver SET name=?,dob=?,nic=?,licensenumber=?,licensetypeid=?,licenseexpiry=?,designation=?,department=?,permitnumber=?,permitissue=?,permitexpiry=?,bloodgroupid=?,contractorid=?,formcount=?, modifiedby=? where id=?";
+    "UPDATE driver SET name=?,dob=?,nic=?,licensenumber=?,licensetypeid=?,licenseexpiry=?,designation=?,department=?,permitnumber=?,permitissue=?,permitexpiry=?,bloodgroupid=?,contractorid=?,ddccount=?, experience=?, modifiedby=? where id=?";
 
   try {
     const client = await pool.pool.getConnection();
@@ -184,7 +185,8 @@ const driverUpdateByID = async (
       permitexpiry,
       bloodgroupid,
       contractorid,
-      formcount,
+      ddccount,
+      experience,
       userid,
       id,
     ]);
@@ -218,15 +220,15 @@ const driverDeleteByID = async (id) => {
  * @returns {result} result
  */
 const driversAll = async () => {
-  const query =
-    "select * from driver where active=1 order by created_at desc limit 100";
-  // const query = "CALL `consulttrain`.`getAllDrivers`();";
+  // const query =
+  // "select * from driver where active=1 order by created_at desc limit 100";
+  const query = "CALL `consulttrain`.`getAllDrivers`();";
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
-    return result[0];
-    // return result[0][0];
+    // return result[0];
+    return result[0][0];
   } catch (error) {
     console.log("error occurred while all drivers");
     return error;
@@ -248,7 +250,7 @@ const driversAll = async () => {
  * @param {Date} permitexpiry driver permit expiry date
  * @param {number} bloodgroupid driver blood group id
  * @param {number} contractorid driver contractor id
- * @param {number} formcount driver formcount
+ * @param {number} ddccount driver formcount
  * @param {number} userid user created
  * @returns
  */
@@ -266,11 +268,12 @@ const driverCreate = async (
   permitexpiry,
   bloodgroupid,
   contractorid,
-  formcount,
+  ddccount,
+  experience,
   userid
 ) => {
   const query =
-    "INSERT INTO driver (name,dob,nic,licensenumber,licensetypeid,licenseexpiry,designation,department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,formcount,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "INSERT INTO driver (name,dob,nic,licensenumber,licensetypeid,licenseexpiry,designation,department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,ddccount,experience,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query, [
@@ -287,7 +290,8 @@ const driverCreate = async (
       permitexpiry,
       bloodgroupid,
       contractorid,
-      formcount,
+      ddccount,
+      experience,
       userid,
       userid,
     ]);

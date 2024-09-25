@@ -22,7 +22,8 @@ const createDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
-      formcount,
+      ddccount,
+      experience,
       userid,
     } = req.body;
 
@@ -62,7 +63,8 @@ const createDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
-      formcount,
+      ddccount,
+      experience,
       userid
     );
     const driverID = JSON.stringify(newDriver[0]);
@@ -232,7 +234,8 @@ const updateDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
-      formcount,
+      ddccount,
+      experience,
       userid,
     } = req.body;
     if (!id) {
@@ -260,7 +263,8 @@ const updateDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
-      formcount,
+      ddccount,
+      experience,
       userid,
       id
     );
