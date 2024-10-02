@@ -19,6 +19,24 @@ const userFind = async (email) => {
     return error;
   }
 };
+/**
+ * This method for fetch user via name
+ * @param {string} username user name
+ * @returns {result} result
+ */
+const findbyUsername = async (username) => {
+  const query = "select username from users where username=? limit 1";
+  //   console.log(email);
+  try {
+    const client = await pool.pool.getConnection();
+    const result = await client.query(query, [username]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    console.log("error occurred while find by Username");
+    return error;
+  }
+};
 
 /**
  * This method use to fetch user by ID
@@ -43,9 +61,9 @@ const userFindByID = async (id) => {
  * @param {string} username user username
  * @param {string} name user name
  * @param {string} mobile user mobile
- * @param {string} profilepic user profile picture
  * @param {string} company user company
  * @param {string} designation user designation
+ * @param {string} imagepath user profile picture
  * @param {string} role user role
  * @param {string} id user id
  * @returns {result} result
@@ -54,23 +72,23 @@ const userUpdateByID = async (
   username,
   name,
   mobile,
-  profilepic,
   company,
   designation,
+  imagepath,
   role,
   id
 ) => {
   const query =
-    "UPDATE users SET name=?, mobile=?, profilepic=?, company=?, designation=?, role=?, modifiedby=? where userid=?";
+    "UPDATE users SET name=?, mobile=?, company=?, designation=?,imagepath=?, role=?, modifiedby=? where userid=?";
 
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       mobile,
-      profilepic,
       company,
       designation,
+      imagepath,
       role,
       username,
       id,
@@ -137,13 +155,13 @@ const createUser = async (
   password,
   name,
   mobile,
-  profilepic,
   company,
   designation,
+  imagepath,
   role
 ) => {
   const query =
-    "INSERT INTO users (username, email, password, name, mobile, profilepic, company, designation, role, createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+    "INSERT INTO users (username, email, password, name, mobile, company, designation,imagepath, role, createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query, [
@@ -152,9 +170,9 @@ const createUser = async (
       password,
       name,
       mobile,
-      profilepic,
       company,
       designation,
+      imagepath,
       role,
       username,
       username,
@@ -231,4 +249,5 @@ module.exports = {
   createRefreshToken,
   findRefreshToken,
   deleteRefreshToken,
+  findbyUsername,
 };

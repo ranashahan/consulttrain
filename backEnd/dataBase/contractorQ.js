@@ -49,20 +49,28 @@ const contractorFindByID = async (id) => {
  */
 const contractorUpdateByID = async (
   name,
-  contact,
+  ntnnumber,
+  contactname,
+  contactnumber,
+  contactdesignation,
+  contactdepartment,
   address,
   initials,
   userid,
   id
 ) => {
   const query =
-    "UPDATE contractor SET name=?, contact=?, address=?,initials=?, modifiedby=? where id=?";
+    "UPDATE contractor SET name=?, ntnnumber=?,contactname=?,contactnumber=?,contactdesignation=?,contactdepartment=?,address=?,initials=?, modifiedby=? where id=?";
 
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
-      contact,
+      ntnnumber,
+      contactname,
+      contactnumber,
+      contactdesignation,
+      contactdepartment,
       address,
       initials,
       userid,
@@ -71,7 +79,7 @@ const contractorUpdateByID = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while user update by ID");
+    console.log("error occurred while contractor update by ID");
     return error;
   }
 };
@@ -114,22 +122,40 @@ const contractorAll = async () => {
 
 /**
  * This method for create contractor.
- * @param {string} name contractor name
- * @param {string} contact contractor contact info
- * @param {string} address contractor address
- * @param {string} initials contractor initials
- * @param {number} userid user ID
+ * @param {string} name
+ * @param {string} ntnnumber
+ * @param {string} contactname
+ * @param {string} contactnumber
+ * @param {string} contactdesignation
+ * @param {string} contactdepartment
+ * @param {string} address
+ * @param {string} initials
+ * @param {number} userid
  * @returns {result} result
  */
-const contractorCreate = async (name, contact, address, initials, userid) => {
+const contractorCreate = async (
+  name,
+  ntnnumber,
+  contactname,
+  contactnumber,
+  contactdesignation,
+  contactdepartment,
+  address,
+  initials,
+  userid
+) => {
   const query =
-    "INSERT INTO contractor (name, contact, address,initials, createdby, modifiedby) VALUES(?,?,?,?,?,?)";
-  console.log(query);
+    "INSERT INTO contractor (name,ntnnumber, contactname,contactnumber,contactdesignation,contactdepartment, address,initials, createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?)";
+  //console.log(query);
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
-      contact,
+      ntnnumber,
+      contactname,
+      contactnumber,
+      contactdesignation,
+      contactdepartment,
       address,
       initials,
       userid,
