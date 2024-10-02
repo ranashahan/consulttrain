@@ -9,7 +9,18 @@ const cc = require("../dataBase/ccQ");
  */
 const createContractor = asyncHandler(async (req, res) => {
   try {
-    const { name, contact, address, initials, clientids, userid } = req.body;
+    const {
+      name,
+      ntnnumber,
+      contactname,
+      contactnumber,
+      contactdesignation,
+      contactdepartment,
+      address,
+      initials,
+      clientids,
+    } = req.body.obj;
+    const { userid } = req.body;
 
     if (!name || !userid || clientids.length < 1) {
       return res.status(422).json({
@@ -26,7 +37,11 @@ const createContractor = asyncHandler(async (req, res) => {
 
     const newContractor = await db.contractorCreate(
       name,
-      contact,
+      ntnnumber,
+      contactname,
+      contactnumber,
+      contactdesignation,
+      contactdepartment,
       address,
       initials,
       userid
@@ -36,9 +51,9 @@ const createContractor = asyncHandler(async (req, res) => {
       clientids,
       JSON.parse(contractorID).insertId
     );
-    console.log(newRelationship);
+    //console.log(newRelationship);
     const info = JSON.stringify(newRelationship[0]);
-
+    console.log(JSON.parse(info).info);
     return res.status(201).json({
       message: `Contractor created successfully with contractorID: ${
         JSON.parse(contractorID).insertId
@@ -96,7 +111,18 @@ const getContractor = asyncHandler(async (req, res) => {
 const updateContractor = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, contact, address, initials, clientids, userid } = req.body;
+    const {
+      name,
+      ntnnumber,
+      contactname,
+      contactnumber,
+      contactdesignation,
+      contactdepartment,
+      address,
+      initials,
+      clientids,
+      userid,
+    } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -110,16 +136,22 @@ const updateContractor = asyncHandler(async (req, res) => {
     }
 
     const deleteContractor = await cc.ccDeleteByContractor(id);
+    // console.log(deleteContractor);
 
     const result = await db.contractorUpdateByID(
       name,
-      contact,
+      ntnnumber,
+      contactname,
+      contactnumber,
+      contactdesignation,
+      contactdepartment,
       address,
       initials,
       userid,
       id
     );
     const newRelationship = await cc.ccCreate(clientids, id);
+    // console.log(newRelationship);
 
     return res.status(201).json(result);
   } catch (error) {

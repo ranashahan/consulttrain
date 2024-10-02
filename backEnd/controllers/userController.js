@@ -13,16 +13,17 @@ const db = require("../dataBase/userQ");
 const registerUser = asyncHandler(async (req, res) => {
   try {
     const {
+      name,
       username,
       email,
       password,
-      name,
       mobile,
-      profilepic,
       company,
       designation,
+      imagepath,
       role,
-    } = req.body;
+    } = req.body.obj;
+    console.log(req.body);
 
     if (!username || !name || !email || !password) {
       return res.status(422).json({
@@ -34,6 +35,12 @@ const registerUser = asyncHandler(async (req, res) => {
     if (users) {
       return res.status(409).json({ message: "Email already exists" });
     }
+    const [validateUsername] = await db.findbyUsername(username);
+    if (validateUsername) {
+      return res
+        .status(409)
+        .json({ message: username + " Username already exists" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await db.createUser(
@@ -42,9 +49,9 @@ const registerUser = asyncHandler(async (req, res) => {
       hashedPassword,
       name,
       mobile,
-      profilepic,
       company,
       designation,
+      imagepath,
       role
     );
     const useridjson = JSON.stringify(newUser[0]);
@@ -100,6 +107,7 @@ const loginUser = asyncHandler(async (req, res) => {
     return res.status(200).json({
       id: userid,
       email: user[0].email,
+      username: user[0].username,
       role: user[0].role,
       accessToken,
       refreshToken,
@@ -177,7 +185,7 @@ const getUser = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, mobile, profilepic, company, designation, role } = req.body;
+    const { name, mobile, company, designation, imagepath, role } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -200,9 +208,9 @@ const updateUser = asyncHandler(async (req, res) => {
       user[0].username,
       name,
       mobile,
-      profilepic,
       company,
       designation,
+      imagepath,
       role,
       id
     );
