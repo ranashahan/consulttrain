@@ -14,7 +14,7 @@ const locationFind = async (name) => {
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while userfind");
+    console.log("error occurred while location find");
     return error;
   }
 };
@@ -32,7 +32,7 @@ const locationFindByID = async (id) => {
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while user find by id");
+    console.log("error occurred while location find by id");
     return error;
   }
 };
@@ -53,7 +53,7 @@ const locationUpdateByID = async (name, userid, id) => {
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while user update by ID");
+    console.log("error occurred while location update by ID");
     return error;
   }
 };
@@ -71,7 +71,7 @@ const locationDeleteByID = async (id) => {
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    console.log("error occurred while location delete by id");
     return error;
   }
 };
@@ -88,7 +88,7 @@ const locationAll = async () => {
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all users");
+    console.log("error occurred while all locations");
     return error;
   }
 };
@@ -108,7 +108,7 @@ const locationCreate = async (name, userid) => {
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create user");
+    console.log("error occurred while create location");
     return error;
   }
 };

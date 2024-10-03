@@ -26,6 +26,9 @@ app.use("/api/visual", require("./routes/visualRoutes.js"));
 app.use("/api/driver", require("./routes/driverRoutes.js"));
 app.use("/api/client", require("./routes/clientRoutes.js"));
 app.use("/api/cc", require("./routes/ccRoutes.js"));
+app.use("/api/activity/master", require("./routes/mastercategoryRoutes.js"));
+app.use("/api/activity/slave", require("./routes/slavecategoryRoutes.js"));
+app.use("/api/activity", require("./routes/activityRoutes.js"));
 // Serve the Angular app's static files from the dist folder
 //app.use(express.static(path.join(__dirname, "consulttrain/browser")));
 

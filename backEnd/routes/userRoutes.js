@@ -19,10 +19,14 @@ router
   .route("/:id")
   .get(
     ensureAuthenticated,
-    roleAuthorize(["admin", "manager", "staff", "member"]),
+    roleAuthorize(["admin", "manager", "staff", "member", "guest"]),
     getUser
   )
-  .put(ensureAuthenticated, roleAuthorize(["admin", "manager"]), updateUser)
+  .put(
+    ensureAuthenticated,
+    roleAuthorize(["admin", "manager", "guest"]),
+    updateUser
+  )
   .delete(ensureAuthenticated, roleAuthorize(["admin", "manager"]), deleteUser);
 router.get("/findbyemail/currentuser", currentUser);
 router.route("/register").post(registerUser);
