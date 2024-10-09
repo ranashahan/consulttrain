@@ -14,7 +14,7 @@ const contractorFind = async (name) => {
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while userfind");
+    console.log("error occurred while contractor find");
     return error;
   }
 };
@@ -32,7 +32,7 @@ const contractorFindByID = async (id) => {
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while user find by id");
+    console.log("error occurred while contractor find by id");
     return error;
   }
 };
@@ -97,7 +97,7 @@ const contractorDeleteByID = async (id) => {
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    console.log("error occurred while contractor delete");
     return error;
   }
 };
@@ -115,7 +115,7 @@ const contractorAll = async () => {
     client.release();
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while all users");
+    console.log("error occurred while all contractors");
     return error;
   }
 };

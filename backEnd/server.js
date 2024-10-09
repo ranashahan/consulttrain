@@ -26,16 +26,15 @@ app.use("/api/visual", require("./routes/visualRoutes.js"));
 app.use("/api/driver", require("./routes/driverRoutes.js"));
 app.use("/api/client", require("./routes/clientRoutes.js"));
 app.use("/api/cc", require("./routes/ccRoutes.js"));
-app.use("/api/activity/master", require("./routes/mastercategoryRoutes.js"));
-app.use("/api/activity/slave", require("./routes/slavecategoryRoutes.js"));
 app.use("/api/activity", require("./routes/activityRoutes.js"));
+app.use("/api/assessment", require("./routes/assessmentRoutes.js"));
 // Serve the Angular app's static files from the dist folder
-//app.use(express.static(path.join(__dirname, "consulttrain/browser")));
+// app.use(express.static(path.join(__dirname, "consulttrain/browser")));
 
 // Route all other requests to the Angular app's index.html
-//app.get("*", (req, res) => {
-//  res.sendFile(path.join(__dirname, "consulttrain/browser/index.html"));
-//});
+// app.get("*", (req, res) => {
+// res.sendFile(path.join(__dirname, "consulttrain/browser/index.html"));
+// });
 app.use(errorHandler);
 
 connectToDataBase

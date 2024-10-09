@@ -12,6 +12,7 @@ const createDriver = asyncHandler(async (req, res) => {
       name,
       dob,
       nic,
+      nicexpiry,
       licensenumber,
       licensetypeid,
       licenseexpiry,
@@ -22,8 +23,10 @@ const createDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
+      visualid,
       ddccount,
       experience,
+      comment,
       userid,
     } = req.body;
 
@@ -53,6 +56,7 @@ const createDriver = asyncHandler(async (req, res) => {
       name,
       dob,
       nic,
+      nicexpiry,
       licensenumber,
       licensetypeid,
       licenseexpiry,
@@ -63,8 +67,10 @@ const createDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
+      visualid,
       ddccount,
       experience,
+      comment,
       userid
     );
     const driverID = JSON.stringify(newDriver[0]);
@@ -134,6 +140,9 @@ const getDriver = asyncHandler(async (req, res) => {
       if (item.dob) {
         item.dob = new Date(item.dob).toLocaleDateString();
       }
+      if (item.nicexpiry) {
+        item.nicexpiry = new Date(item.nicexpiry).toLocaleDateString();
+      }
       if (item.licenseexpiry) {
         item.licenseexpiry = new Date(item.licenseexpiry).toLocaleDateString();
       }
@@ -169,7 +178,28 @@ const getDriverByNIC = asyncHandler(async (req, res) => {
         message: `wrong NIC ${nic} provided`,
       });
     }
-    return res.status(200).json(result);
+
+    let dataFromDatabase = result;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.dob) {
+        item.dob = new Date(item.dob).toLocaleDateString();
+      }
+      if (item.nicexpiry) {
+        item.nicexpiry = new Date(item.nicexpiry).toLocaleDateString();
+      }
+      if (item.licenseexpiry) {
+        item.licenseexpiry = new Date(item.licenseexpiry).toLocaleDateString();
+      }
+      if (item.permitissue) {
+        item.permitissue = new Date(item.permitissue).toLocaleDateString();
+      }
+      if (item.permitexpiry) {
+        item.permitexpiry = new Date(item.permitexpiry).toLocaleDateString();
+      }
+      return item;
+    });
+
+    return res.status(200).json(formattedResponse);
   } catch (error) {
     res.status(500);
   }
@@ -193,6 +223,9 @@ const getDriverSearch = asyncHandler(async (req, res) => {
     const formattedResponse = dataFromDatabase.map((item) => {
       if (item.dob) {
         item.dob = new Date(item.dob).toLocaleDateString();
+      }
+      if (item.nicexpiry) {
+        item.nicexpiry = new Date(item.nicexpiry).toLocaleDateString();
       }
       if (item.licenseexpiry) {
         item.licenseexpiry = new Date(item.licenseexpiry).toLocaleDateString();
@@ -224,6 +257,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       name,
       dob,
       nic,
+      nicexpiry,
       licensenumber,
       licensetypeid,
       licenseexpiry,
@@ -234,8 +268,10 @@ const updateDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
+      visualid,
       ddccount,
       experience,
+      comment,
       userid,
     } = req.body;
     if (!id) {
@@ -253,6 +289,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       name,
       dob,
       nic,
+      nicexpiry,
       licensenumber,
       licensetypeid,
       licenseexpiry,
@@ -263,8 +300,10 @@ const updateDriver = asyncHandler(async (req, res) => {
       permitexpiry,
       bloodgroupid,
       contractorid,
+      visualid,
       ddccount,
       experience,
+      comment,
       userid,
       id
     );
@@ -287,8 +326,8 @@ const deleteDriver = asyncHandler(async (req, res) => {
         message: "Please provide param (id)",
       });
     }
-    const Bloodgroup = await db.driverFindByID(id);
-    if (Bloodgroup.length < 1) {
+    const driver = await db.driverFindByID(id);
+    if (driver.length < 1) {
       return res.status(422).json({
         message: `wrong param (id ${id}) provided`,
       });
