@@ -1,5 +1,5 @@
 CALL insert_session_data(
-    'Session 8',  	-- session name
+    'Session 9',  	-- session name
     '2024-10-04',  	-- session date
     6001, 			-- location id
     7001,			-- result id
@@ -19,6 +19,13 @@ CALL insert_session_data(
       {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Middle", "score": 2, "assessmentdate": "2024-10-04"},
       {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Final", "score": 3, "assessmentdate": "2024-10-04"}]'  -- Assessment data as JSON
 );
+
+CALL `consulttrain`.`update_session_data`(20, '2024-10-18', null, null, null,null, null, 8, null, null, null,null, null, 1001, 
+'[{"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Initial", "score": 1, "assessmentdate": "2024-10-04"},
+      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Middle", "score": 2, "assessmentdate": "2024-10-04"},
+      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Final", "score": 3, "assessmentdate": "2024-10-04"}]'
+);
+
 
 CALL get_session_data('41103-0237290-5', 'CONT-993', 'Session 2','Final');
 CALL get_session_data(NULL,NULL,NULL,NULL);

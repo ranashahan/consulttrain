@@ -157,7 +157,23 @@ const getSession = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    return res.status(200).json(result);
+
+    let dataFromDatabase = result;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.sessiondate) {
+        item.sessiondate = new Date(item.sessiondate).toLocaleDateString();
+      }
+      if (item.classdate) {
+        item.classdate = new Date(item.classdate).toLocaleDateString();
+      }
+      if (item.yarddate) {
+        item.yarddate = new Date(item.yarddate).toLocaleDateString();
+      }
+      return item;
+    });
+
+    return res.status(200).json(formattedResponse);
+    //return res.status(200).json(result);
   } catch (error) {
     res.status(500);
   }
@@ -168,22 +184,64 @@ const getSession = asyncHandler(async (req, res) => {
  * @route PUT /api/session/:id
  * @access private
  */
-const updatesession = asyncHandler(async (req, res) => {
+const updateSession = asyncHandler(async (req, res) => {
   try {
+    const {
+      sessionDate,
+      locationId,
+      resultId,
+      stageId,
+      titleId,
+      vehicleId,
+      totalScore,
+      classdate,
+      yarddate,
+      weather,
+      traffic,
+      route,
+      assessmentData,
+    } = req.body.obj;
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { userid } = req.body;
+
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
       });
     }
-    const session = await db.bgFindByID(id);
+
+    if (!sessionDate || !userid || !assessmentData) {
+      return res.status(422).json({
+        message:
+          "Please fill in all fields (sessionDate, userid and assessmentData)",
+      });
+    }
+
+    const session = await db.sessionFindByID(id);
     if (session.length < 1) {
       return res.status(422).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.bgUpdateByID(name, userid, id);
+
+    //return res.status(200).json({ message: "Successfull" });
+    const result = await db.sessionUpdateByID(
+      id,
+      sessionDate,
+      locationId,
+      resultId,
+      stageId,
+      titleId,
+      vehicleId,
+      totalScore,
+      classdate,
+      yarddate,
+      weather,
+      traffic,
+      route,
+      userid,
+      assessmentData
+    );
 
     return res.status(201).json(result);
   } catch (error) {
@@ -221,4 +279,5 @@ module.exports = {
   createAssessment,
   getSessionByDate,
   getSession,
+  updateSession,
 };
