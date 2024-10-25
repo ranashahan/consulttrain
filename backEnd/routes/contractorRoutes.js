@@ -10,6 +10,7 @@ const {
 } = require("../controllers/contractorController");
 
 router.route("/create").post(ensureAuthenticated, createContractor);
+// router.route("/getAll").get(getContractors);
 router.route("/getAll").get(ensureAuthenticated, getContractors);
 router
   .route("/:id")

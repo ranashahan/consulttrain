@@ -209,15 +209,49 @@ const sessionFindByID = async (id) => {
  * @param {int} id session id
  * @returns {result} result
  */
-const sessionUpdateByID = async (name, userid, id) => {
-  const query = "UPDATE session SET name=?, modifiedby=? where id=?";
+const sessionUpdateByID = async (
+  id,
+  sessionDate,
+  locationId,
+  resultId,
+  stageId,
+  titleId,
+  vehicleId,
+  totalScore,
+  classdate,
+  yarddate,
+  weather,
+  traffic,
+  route,
+  userid,
+  assessmentData
+) => {
+  const params = [
+    id,
+    sessionDate,
+    locationId,
+    resultId,
+    stageId,
+    titleId,
+    vehicleId,
+    totalScore,
+    classdate,
+    yarddate,
+    weather,
+    traffic,
+    route,
+    userid,
+    JSON.stringify(assessmentData), // Convert assessmentData to JSON string
+  ];
+  const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   try {
     const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, id]);
+    const result = await client.query(query, params);
     client.release();
     return result;
   } catch (error) {
+    console.log(error);
     console.log("error occurred while session update by ID");
     return error;
   }
