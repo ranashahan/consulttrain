@@ -21,9 +21,9 @@ CALL insert_session_data(
 );
 
 CALL `consulttrain`.`update_session_data`(20, '2024-10-18', null, null, null,null, null, 8, null, null, null,null, null, 1001, 
-'[{"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Initial", "score": 1, "assessmentdate": "2024-10-04"},
-      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Middle", "score": 2, "assessmentdate": "2024-10-04"},
-      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Final", "score": 3, "assessmentdate": "2024-10-04"}]'
+'[{"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Initial", "score": 1, "assessmentdate": "2024-10-18"},
+      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Middle", "score": 2, "assessmentdate": "2024-10-18"},
+      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Final", "score": 3, "assessmentdate": "2024-10-18"}]'
 );
 
 

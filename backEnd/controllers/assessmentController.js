@@ -253,7 +253,7 @@ const updateSession = asyncHandler(async (req, res) => {
  * @route DELETE /api/session/:id
  * @access private
  */
-const deletesession = asyncHandler(async (req, res) => {
+const deleteSession = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
@@ -261,13 +261,13 @@ const deletesession = asyncHandler(async (req, res) => {
         message: "Please provide param (id)",
       });
     }
-    const session = await db.bgFindByID(id);
+    const session = await db.sessionFindByID(id);
     if (session.length < 1) {
       return res.status(422).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.bgDeleteByID(id);
+    const result = await db.sessionDeleteByID(id);
     return res.status(201).json(result);
   } catch (error) {
     res.status(500);
@@ -280,4 +280,5 @@ module.exports = {
   getSessionByDate,
   getSession,
   updateSession,
+  deleteSession,
 };

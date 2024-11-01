@@ -12,7 +12,7 @@ const {
   deleteSlaveCategory,
   updateSlaveCategory,
   getSlaveCategory,
-  getSlaveCategorys,
+  getSlaveCategories,
   createSlaveCategory,
 } = require("../controllers/slavecategoryController");
 const {
@@ -33,7 +33,7 @@ router
   .route("/:id")
   .get(ensureAuthenticated, getActivity)
   .put(ensureAuthenticated, updateActivity)
-  .delete(ensureAuthenticated, deleteActivity);
+  .post(ensureAuthenticated, deleteActivity);
 
 /**
  * This is master categories routes
@@ -44,16 +44,16 @@ router
   .route("/master/:id")
   .get(ensureAuthenticated, getMasterCategory)
   .put(ensureAuthenticated, updateMasterCategory)
-  .delete(ensureAuthenticated, deleteMasterCategory);
+  .post(ensureAuthenticated, deleteMasterCategory);
 
 /**
  * This is slave categories routes
  */
 router.route("/slave/create").post(ensureAuthenticated, createSlaveCategory);
-router.route("/slave/getAll").get(ensureAuthenticated, getSlaveCategorys);
+router.route("/slave/getAll").get(ensureAuthenticated, getSlaveCategories);
 router
   .route("/slave/:id")
   .get(ensureAuthenticated, getSlaveCategory)
   .put(ensureAuthenticated, updateSlaveCategory)
-  .delete(ensureAuthenticated, deleteSlaveCategory);
+  .post(ensureAuthenticated, deleteSlaveCategory);
 module.exports = router;

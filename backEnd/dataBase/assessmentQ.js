@@ -262,7 +262,7 @@ const sessionUpdateByID = async (
  * @returns {result} result
  */
 const sessionDeleteByID = async (id) => {
-  const query = "UPDATE session SET active=0 where id=?";
+  const query = "CALL delete_session_data(?);";
 
   try {
     const client = await pool.pool.getConnection();

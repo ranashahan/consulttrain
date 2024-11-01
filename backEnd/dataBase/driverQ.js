@@ -127,6 +127,24 @@ const driverFindByID = async (id) => {
     return error;
   }
 };
+/**
+ * This method use to fetch driver by ID
+ * @param {string} id driver param id
+ * @returns {result} result
+ */
+const driverSessionFindByID = async (id) => {
+  // const query = "select * from driver where id=? and active=1 limit 1";
+  const query = "select * from session_driver where driver_id = ?;";
+  try {
+    const client = await pool.pool.getConnection();
+    const result = await client.query(query, [id]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    console.log("error occurred while driver session find by id");
+    return error;
+  }
+};
 
 /**
  * This method will update driver via userid
@@ -334,4 +352,5 @@ module.exports = {
   driverFindByNIC,
   driverFindByName,
   driverSearch,
+  driverSessionFindByID,
 };

@@ -38,6 +38,25 @@ const scFindByID = async (id) => {
 };
 
 /**
+ * This method use to fetch activity by slave ID
+ * @param {number} id slave category id
+ * @returns response
+ */
+const scFindByMasterID = async (id) => {
+  const query =
+    "select id,name,description,initials,mastercategoryid from slavecategory where mastercategoryid = ? and active=1";
+  try {
+    const client = await pool.pool.getConnection();
+    const result = await client.query(query, [id]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    console.log("error occurred while activity find by slave id");
+    return error;
+  }
+};
+
+/**
  * This method will update slavecategory via id
  * @param {string} name slavecategory name
  * @param {string} description slavecategory description
@@ -154,4 +173,5 @@ module.exports = {
   scUpdateByID,
   scFindByID,
   scFind,
+  scFindByMasterID,
 };

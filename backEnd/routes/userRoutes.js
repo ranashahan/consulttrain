@@ -11,6 +11,7 @@ const {
   refreshToken,
   deleteUser,
   logoutUser,
+  updateUserPassword,
 } = require("../controllers/userController");
 
 router.get("/getusers", ensureAuthenticated, getUsers);
@@ -24,7 +25,7 @@ router
   )
   .put(
     ensureAuthenticated,
-    roleAuthorize(["admin", "manager", "guest"]),
+    roleAuthorize(["admin", "manager", "staff", "member", "guest"]),
     updateUser
   )
   .delete(ensureAuthenticated, roleAuthorize(["admin", "manager"]), deleteUser);
@@ -32,6 +33,13 @@ router.get("/findbyemail/currentuser", currentUser);
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").post(logoutUser);
+router
+  .route("/newpassword")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(["admin", "manager"]),
+    updateUserPassword
+  );
 router.route("/login/refreshtoken").post(refreshToken);
 
 // router.route('/:id').get(getContact).put(updateContact).delete(deleteContact);

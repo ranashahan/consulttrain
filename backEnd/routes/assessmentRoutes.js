@@ -7,6 +7,7 @@ const {
   getSessionByDate,
   getSession,
   updateSession,
+  deleteSession,
 } = require("../controllers/assessmentController");
 
 router
@@ -25,7 +26,11 @@ router
     ensureAuthenticated,
     roleAuthorize(["admin", "manager", "staff"]),
     updateSession
+  )
+  .delete(
+    ensureAuthenticated,
+    roleAuthorize(["admin", "manager", "staff"]),
+    deleteSession
   );
-//   .delete(ensureAuthenticated, deleteActivity);
 
 module.exports = router;
