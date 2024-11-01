@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/mastercategoryQ");
+const dbSlave = require("../dataBase/slavecategoryQ");
 
 /**
  * @description Create a mastercategory
@@ -121,6 +122,14 @@ const deleteMasterCategory = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
+
+    const slaveCategories = await dbSlave.scFindByMasterID(id);
+    if (slaveCategories.length > 0) {
+      return res.status(422).json({
+        message: `Category ${id} has active secondary categories and cannot be deleted.`,
+      });
+    }
+
     const result = await db.mcDeleteByID(userid, id);
     return res.status(201).json(result);
   } catch (error) {

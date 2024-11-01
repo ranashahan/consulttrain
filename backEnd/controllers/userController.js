@@ -185,7 +185,8 @@ const getUser = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, mobile, company, designation, imagepath, role } = req.body;
+    const { name, mobile, company, designation, imagepath, role, userid } =
+      req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -197,21 +198,21 @@ const updateUser = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const userid = user[0].userid;
-    if (id == userid) {
+    const currentUserid = user[0].userid;
+    if (id == currentUserid) {
     } else {
       res.status(403).json({
         message: `Provided (id ${id}) and database id does not match`,
       });
     }
     const result = await db.userUpdateByID(
-      user[0].username,
       name,
       mobile,
       company,
       designation,
       imagepath,
       role,
+      userid,
       id
     );
 
@@ -220,6 +221,52 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(500);
   }
 });
+
+/**
+ * @description update user password against body id
+ * @route PUT /api/users/newpassword
+ * @access private
+ */
+const updateUserPassword = asyncHandler(async (req, res) => {
+  try {
+    const { id, password, userid } = req.body;
+    if (!id) {
+      return res.status(422).json({
+        message: "Please provide id (id)",
+      });
+    }
+
+    const user = await db.userFindByID(id);
+    if (user.length < 1) {
+      return res.status(422).json({
+        message: `wrong param (id ${id}) provided`,
+      });
+    }
+
+    if (!userid || !password) {
+      return res.status(422).json({
+        message: "Please fill in all fields (userid and password)",
+      });
+    }
+
+    const currentUserid = user[0].userid;
+    if (id == currentUserid) {
+    } else {
+      res.status(403).json({
+        message: `Provided (id ${id}) and database id does not match`,
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await db.userUpdatePasswordByID(hashedPassword, userid, id);
+
+    return res.status(201).json(result);
+  } catch (error) {
+    res.status(500);
+  }
+});
+
 /**
  * @description delete user against param id
  * @route DELETE /api/users/:id
@@ -342,4 +389,5 @@ module.exports = {
   currentUser,
   deleteUser,
   logoutUser,
+  updateUserPassword,
 };

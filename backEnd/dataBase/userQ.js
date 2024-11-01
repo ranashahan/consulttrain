@@ -7,7 +7,7 @@ const pool = require("./db.js");
  */
 const userFind = async (email) => {
   const query =
-    "select userid,username,email,password,role from users where email=? limit 1";
+    "select userid,username,email,password,role from users where email=? and active=1 limit 1";
   //   console.log(email);
   try {
     const client = await pool.pool.getConnection();
@@ -25,7 +25,8 @@ const userFind = async (email) => {
  * @returns {result} result
  */
 const findbyUsername = async (username) => {
-  const query = "select username from users where username=? limit 1";
+  const query =
+    "select username from users where username=? and active = 1 limit 1";
   //   console.log(email);
   try {
     const client = await pool.pool.getConnection();
@@ -44,7 +45,7 @@ const findbyUsername = async (username) => {
  * @returns {result} result
  */
 const userFindByID = async (id) => {
-  const query = "select * from users where userid=?";
+  const query = "select * from users where userid=? and active = 1";
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
@@ -69,13 +70,13 @@ const userFindByID = async (id) => {
  * @returns {result} result
  */
 const userUpdateByID = async (
-  username,
   name,
   mobile,
   company,
   designation,
   imagepath,
   role,
+  userid,
   id
 ) => {
   const query =
@@ -90,7 +91,7 @@ const userUpdateByID = async (
       designation,
       imagepath,
       role,
-      username,
+      userid,
       id,
     ]);
     client.release();
@@ -100,13 +101,34 @@ const userUpdateByID = async (
     return error;
   }
 };
+
+/**
+ * This method will update user password via userid
+ * @param {string} password
+ * @param {number} userid
+ * @param {number} id
+ * @returns
+ */
+const userUpdatePasswordByID = async (password, userid, id) => {
+  const query = "UPDATE users SET password=?, modifiedby=? where userid=?";
+  try {
+    const client = await pool.pool.getConnection();
+    const result = await client.query(query, [password, userid, id]);
+    client.release();
+    return result;
+  } catch (error) {
+    console.log("error occurred while user update password by ID");
+    return error;
+  }
+};
+
 /**
  * This method will delete user via userid
  * @param {string} id user id
  * @returns {result} result
  */
 const userDeleteByID = async (id) => {
-  const query = "DELETE FROM users where userid=?";
+  const query = "update users set active = 0 where userid=?";
 
   try {
     const client = await pool.pool.getConnection();
@@ -124,7 +146,7 @@ const userDeleteByID = async (id) => {
  * @returns {result} result
  */
 const allUsers = async () => {
-  const query = "select * from users";
+  const query = "select * from users where active=1";
   try {
     const client = await pool.pool.getConnection();
     const result = await client.query(query);
@@ -250,4 +272,5 @@ module.exports = {
   findRefreshToken,
   deleteRefreshToken,
   findbyUsername,
+  userUpdatePasswordByID,
 };

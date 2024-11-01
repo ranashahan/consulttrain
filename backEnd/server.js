@@ -8,8 +8,17 @@ const connectToDataBase = require("./dataBase/db.js");
 const app = express();
 
 const port = process.env.PORT || 5000;
-app.use(cors());
-app.options("*", cors());
+
+const corsOptions = {
+  origin: "*", // or specify allowed origins like 'http://localhost:4200'
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"], // specify the headers you're using
+  credentials: true, // if you need to include cookies or authorization headers
+  maxAge: 600, // Cache preflight response for 10 minutes
+};
+
+app.use(cors(corsOptions));
+//app.options("*", cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use("/api/users", require("./routes/userRoutes"));

@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/slavecategoryQ");
 const dbMaster = require("../dataBase/mastercategoryQ");
+const dbActivity = require("../dataBase/activityQ");
 
 /**
  * @description Create a slavecategory
@@ -55,7 +56,7 @@ const createSlaveCategory = asyncHandler(async (req, res) => {
  * @route GET /api/slavecategory/getAll
  * @access private
  */
-const getSlaveCategorys = asyncHandler(async (req, res) => {
+const getSlaveCategories = asyncHandler(async (req, res) => {
   try {
     const result = await db.scAll();
     return res.status(200).json(result);
@@ -151,6 +152,14 @@ const deleteSlaveCategory = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
+
+    const activities = await dbActivity.activityFindBySlaveID(id);
+    if (activities.length > 0) {
+      return res.status(422).json({
+        message: `Category ${id} has active activities and cannot be deleted.`,
+      });
+    }
+
     const result = await db.scDeleteByID(userid, id);
     return res.status(201).json(result);
   } catch (error) {
@@ -162,6 +171,6 @@ module.exports = {
   deleteSlaveCategory,
   updateSlaveCategory,
   getSlaveCategory,
-  getSlaveCategorys,
+  getSlaveCategories,
   createSlaveCategory,
 };

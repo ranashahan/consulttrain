@@ -332,6 +332,14 @@ const deleteDriver = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
+
+    const session = await db.driverSessionFindByID(id);
+    if (session.length > 0) {
+      return res.status(422).json({
+        message: `Driver ${id} has active sessions and cannot be deleted.`,
+      });
+    }
+
     const result = await db.driverDeleteByID(id);
     return res.status(201).json(result);
   } catch (error) {
