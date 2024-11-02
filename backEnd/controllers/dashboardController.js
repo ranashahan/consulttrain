@@ -20,7 +20,7 @@ const getDashboardLocation = asyncHandler(async (req, res) => {
  * @route GET /api/driver/dashboardcounts
  * @access private
  */
-const getDashboardCounts = asyncHandler(async (req, res) => {
+const getDashboardDriverCounts = asyncHandler(async (req, res) => {
   try {
     const result = await db.dashboardDriverSessionCount();
     return res.status(200).json(result);
@@ -29,7 +29,22 @@ const getDashboardCounts = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @description get all the Dashboards
+ * @route GET /api/driver/dashboardcounts
+ * @access private
+ */
+const getDashboardTrainerCounts = asyncHandler(async (req, res) => {
+  try {
+    const result = await db.dashboardTrainSessionCount();
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(500);
+  }
+});
+
 module.exports = {
   getDashboardLocation,
-  getDashboardCounts,
+  getDashboardDriverCounts,
+  getDashboardTrainerCounts,
 };
