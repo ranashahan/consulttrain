@@ -8,9 +8,15 @@ const {
   updateTrainer,
   deleteTrainer,
 } = require("../controllers/trainerController");
+const {
+  getDashboardTrainerCounts,
+} = require("../controllers/dashboardController");
 
 router.route("/create").post(ensureAuthenticated, createTrainer);
 router.route("/getAll").get(ensureAuthenticated, getTrainers);
+router
+  .route("/dashboardcounts")
+  .get(ensureAuthenticated, getDashboardTrainerCounts);
 router
   .route("/:id")
   .get(ensureAuthenticated, getTrainer)

@@ -32,7 +32,7 @@ const driverFindByNIC = async (nic) => {
     client.release();
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while driver find");
+    console.log("error occurred while driver find by NIC");
     return error;
   }
 };

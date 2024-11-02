@@ -10,13 +10,17 @@ const {
   getDrivers,
   createDriver,
 } = require("../controllers/driverController");
-const { getDashboardCounts } = require("../controllers/dashboardController");
+const {
+  getDashboardDriverCounts,
+} = require("../controllers/dashboardController");
 
 router.route("/create").post(ensureAuthenticated, createDriver);
 router.route("/getAll").get(ensureAuthenticated, getDrivers);
 router.route("/nic").get(ensureAuthenticated, getDriverByNIC);
 router.route("/search").get(ensureAuthenticated, getDriverSearch);
-router.route("/dashboardcounts").get(ensureAuthenticated, getDashboardCounts);
+router
+  .route("/dashboardcounts")
+  .get(ensureAuthenticated, getDashboardDriverCounts);
 router
   .route("/:id")
   .get(ensureAuthenticated, getDriver)

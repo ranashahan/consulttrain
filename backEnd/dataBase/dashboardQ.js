@@ -36,8 +36,26 @@ const dashboardDriverSessionCount = async () => {
     return error;
   }
 };
+/**
+ * This method for fetch count trainer & session yearly, monthly for dashboard
+ * @returns {result} result
+ */
+const dashboardTrainSessionCount = async () => {
+  const query = `CALL getdashboard_Trainer();`;
+  //   console.log(email);
+  try {
+    const client = await pool.pool.getConnection();
+    const result = await client.query(query);
+    client.release();
+    return result[0][0];
+  } catch (error) {
+    console.log("error occurred while dashboard driver & session count");
+    return error;
+  }
+};
 
 module.exports = {
   dashboardLoactionCount,
   dashboardDriverSessionCount,
+  dashboardTrainSessionCount,
 };
