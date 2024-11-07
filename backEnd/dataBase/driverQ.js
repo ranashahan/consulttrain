@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const driverFindByName = async (name) => {
   const query = "select id from driver where name=? and active=1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while driver find");
+    client.release();
+    console.error("error occurred while driver find: " + error);
     return error;
   }
 };
@@ -25,14 +25,14 @@ const driverFindByName = async (name) => {
  */
 const driverFindByNIC = async (nic) => {
   const query = "CALL `consulttrain`.`getDriverByNIC`(?);";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [nic]);
     client.release();
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while driver find by NIC");
+    client.release();
+    console.error("error occurred while driver find by NIC: " + error);
     return error;
   }
 };
@@ -42,6 +42,7 @@ const driverFindByNIC = async (nic) => {
  * @returns {result} result
  */
 const driverSearch = async (req) => {
+  const client = await pool.getConnection();
   try {
     const {
       name,
@@ -79,12 +80,12 @@ const driverSearch = async (req) => {
         conditions.join(" AND ") +
         "and active=1 order by created_at desc limit 10";
     }
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while driver search");
+    client.release();
+    console.error("error occurred while driver search: " + error);
     return error;
   }
 };
@@ -96,14 +97,14 @@ const driverSearch = async (req) => {
  */
 const driverFindByLicense = async (licensenumber) => {
   const query = "select * from driver where licensenumber=? and active=1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [licensenumber]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while driver find");
+    client.release();
+    console.error("error occurred while driver find: " + error);
     return error;
   }
 };
@@ -116,14 +117,15 @@ const driverFindByLicense = async (licensenumber) => {
 const driverFindByID = async (id) => {
   // const query = "select * from driver where id=? and active=1 limit 1";
   const query = "CALL `consulttrain`.`getDriverByID`(?);";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0][0];
     // return result[0];
   } catch (error) {
-    console.log("error occurred while driver find by id");
+    client.release();
+    console.error("error occurred while driver find by id: " + error);
     return error;
   }
 };
@@ -133,15 +135,15 @@ const driverFindByID = async (id) => {
  * @returns {result} result
  */
 const driverSessionFindByID = async (id) => {
-  // const query = "select * from driver where id=? and active=1 limit 1";
   const query = "select * from session_driver where driver_id = ?;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while driver session find by id");
+    client.release();
+    console.error("error occurred while driver session find by id: " + error);
     return error;
   }
 };
@@ -165,6 +167,7 @@ const driverSessionFindByID = async (id) => {
  * @param {number} visualid driver visual id
  * @param {number} ddccount driver course count
  * @param {number} experience driver years of experience.
+ * @param {string} code driver code
  * @param {number} userid user userid as modified by
  * @param {number} id driver id
  * @returns {result} result
@@ -187,15 +190,16 @@ const driverUpdateByID = async (
   visualid,
   ddccount,
   experience,
+  code,
   comment,
   userid,
   id
 ) => {
-  const query =
-    "UPDATE driver SET name=?,dob=?,nic=?,nicexpiry=?,licensenumber=?,licensetypeid=?,licenseexpiry=?,designation=?,department=?,permitnumber=?,permitissue=?,permitexpiry=?,bloodgroupid=?,contractorid=?,visualid=?,ddccount=?, experience=?,comment=?, modifiedby=? where id=?";
-
+  const query = `UPDATE driver SET name=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?, 
+    designation=?, department=?, permitnumber=?, permitissue=?, permitexpiry=?, bloodgroupid=?, contractorid=?, 
+    visualid=?, ddccount=?, experience=?, code=?, comment=?, modifiedby=? where id=?`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       dob,
@@ -214,6 +218,7 @@ const driverUpdateByID = async (
       visualid,
       ddccount,
       experience,
+      code,
       comment,
       userid,
       id,
@@ -221,7 +226,8 @@ const driverUpdateByID = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while driver update by ID");
+    client.release();
+    console.error("error occurred while driver update by ID: " + error);
     return error;
   }
 };
@@ -232,13 +238,14 @@ const driverUpdateByID = async (
  */
 const driverDeleteByID = async (id) => {
   const query = "UPDATE driver SET active=0 where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while delete driver");
+    client.release();
+    console.error("error occurred while delete driver: " + error);
     return error;
   }
 };
@@ -248,17 +255,16 @@ const driverDeleteByID = async (id) => {
  * @returns {result} result
  */
 const driversAll = async () => {
-  // const query =
-  // "select * from driver where active=1 order by created_at desc limit 100";
   const query = "CALL `consulttrain`.`getAllDrivers`();";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     // return result[0];
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while all drivers");
+    client.release();
+    console.error("error occurred while all drivers: " + error);
     return error;
   }
 };
@@ -282,6 +288,7 @@ const driversAll = async () => {
  * @param {number} visualid driver visual id
  * @param {number} ddccount driver formcount
  * @param {number} experience driver exerience
+ * @param {string} code driver code
  * @param {string} comment driver comment
  * @param {number} userid user created
  * @returns
@@ -304,13 +311,15 @@ const driverCreate = async (
   visualid,
   ddccount,
   experience,
+  code,
   comment,
   userid
 ) => {
-  const query =
-    "INSERT INTO driver (name,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,designation,department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  const query = `INSERT INTO driver (name,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,designation,
+    department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
+    code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       dob,
@@ -329,6 +338,7 @@ const driverCreate = async (
       visualid,
       ddccount,
       experience,
+      code,
       comment,
       userid,
       userid,
@@ -336,8 +346,8 @@ const driverCreate = async (
     client.release();
     return result;
   } catch (error) {
-    console.log(error);
-    console.log("error occurred while create driver");
+    client.release();
+    console.error("error occurred while create driver: " + error);
     return error;
   }
 };

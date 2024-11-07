@@ -18,4 +18,4 @@ const connectToDataBase = async () => {
   }
 };
 
-module.exports = { pool, connectToDataBase };
+module.exports = pool;

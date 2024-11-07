@@ -1,5 +1,4 @@
 const pool = require("./db.js");
-const clientdb = require("./clientQ.js");
 
 /**
  * This method for fetch contractor id via contractor name
@@ -8,13 +7,14 @@ const clientdb = require("./clientQ.js");
  */
 const contractorFind = async (name) => {
   const query = "select id from contractor where name=? limit 1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while contractor find");
+    client.release();
+    console.error("error occurred while contractor find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const contractorFind = async (name) => {
  */
 const contractorFindByID = async (id) => {
   const query = "select * from contractor where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while contractor find by id");
+    client.release();
+    console.error("error occurred while contractor find by id: " + error);
     return error;
   }
 };
@@ -40,6 +41,7 @@ const contractorFindByID = async (id) => {
 /**
  * This method will update contractor via userid
  * @param {string} name contractor name
+ * @param {string} description contractor description
  * @param {string} contact contractor contact info
  * @param {string} address contractor address
  * @param {string} initials contractor initials
@@ -49,6 +51,7 @@ const contractorFindByID = async (id) => {
  */
 const contractorUpdateByID = async (
   name,
+  description,
   ntnnumber,
   contactname,
   contactnumber,
@@ -60,12 +63,12 @@ const contractorUpdateByID = async (
   id
 ) => {
   const query =
-    "UPDATE contractor SET name=?, ntnnumber=?,contactname=?,contactnumber=?,contactdesignation=?,contactdepartment=?,address=?,initials=?, modifiedby=? where id=?";
-
+    "UPDATE contractor SET name=?,description=?, ntnnumber=?,contactname=?,contactnumber=?,contactdesignation=?,contactdepartment=?,address=?,initials=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
+      description,
       ntnnumber,
       contactname,
       contactnumber,
@@ -79,7 +82,8 @@ const contractorUpdateByID = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while contractor update by ID");
+    client.release();
+    console.error("error occurred while contractor update by ID: " + error);
     return error;
   }
 };
@@ -90,14 +94,14 @@ const contractorUpdateByID = async (
  */
 const contractorDeleteByID = async (id) => {
   const query = "DELETE FROM contractor where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while contractor delete");
+    client.release();
+    console.error("error occurred while contractor delete: " + error);
     return error;
   }
 };
@@ -108,14 +112,14 @@ const contractorDeleteByID = async (id) => {
  */
 const contractorAll = async () => {
   const query = "CALL `consulttrain`.`getAllContractors`();";
-  // const query = "SELECT * FROM contractor;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while all contractors");
+    client.release();
+    console.error("error occurred while all contractors: " + error);
     return error;
   }
 };
@@ -123,6 +127,7 @@ const contractorAll = async () => {
 /**
  * This method for create contractor.
  * @param {string} name
+ * @param {string} description
  * @param {string} ntnnumber
  * @param {string} contactname
  * @param {string} contactnumber
@@ -135,6 +140,7 @@ const contractorAll = async () => {
  */
 const contractorCreate = async (
   name,
+  description,
   ntnnumber,
   contactname,
   contactnumber,
@@ -144,13 +150,13 @@ const contractorCreate = async (
   initials,
   userid
 ) => {
-  const query =
-    "INSERT INTO contractor (name,ntnnumber, contactname,contactnumber,contactdesignation,contactdepartment, address,initials, createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?)";
-  //console.log(query);
+  const query = `INSERT INTO contractor (name, description, ntnnumber, contactname, contactnumber, contactdesignation, contactdepartment, address, initials,
+     createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?)`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
+      description,
       ntnnumber,
       contactname,
       contactnumber,
@@ -164,7 +170,8 @@ const contractorCreate = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create contractor");
+    client.release();
+    console.error("error occurred while create contractor: " + error);
     return error;
   }
 };

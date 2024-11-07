@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const vehicleFind = async (name) => {
   const query = "select id from vehicle where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while vehicle find");
+    client.release();
+    console.error("error occurred while vehicle find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const vehicleFind = async (name) => {
  */
 const vehicleFindByID = async (id) => {
   const query = "select * from vehicle where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while vehicle find by id");
+    client.release();
+    console.error("error occurred while vehicle find by id: " + error);
     return error;
   }
 };
@@ -40,20 +41,22 @@ const vehicleFindByID = async (id) => {
 /**
  * This method will update vehicle via userid
  * @param {string} name vehicle name
+ * @param {string} description vehicle description
  * @param {string} userid user userid as modified by
  * @param {int} id vehicle id
  * @returns {vehicle} vehicle
  */
-const vehicleUpdateByID = async (name, userid, id) => {
-  const query = "UPDATE vehicle SET name=?, modifiedby=? where id=?";
-
+const vehicleUpdateByID = async (name, description, userid, id) => {
+  const query =
+    "UPDATE vehicle SET name=?, description=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, id]);
+    const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while vehicle update by ID");
+    client.release();
+    console.error("error occurred while vehicle update by ID: " + error);
     return error;
   }
 };
@@ -64,14 +67,14 @@ const vehicleUpdateByID = async (name, userid, id) => {
  */
 const vehicleDeleteByID = async (id) => {
   const query = "DELETE FROM vehicle where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while delete vehicle: " + error);
     return error;
   }
 };
@@ -82,13 +85,14 @@ const vehicleDeleteByID = async (id) => {
  */
 const vehicleAll = async () => {
   const query = "SELECT * FROM vehicle;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all vehicle");
+    client.release();
+    console.error("error occurred while all vehicle: " + error);
     return error;
   }
 };
@@ -96,19 +100,26 @@ const vehicleAll = async () => {
 /**
  * This method for create vehicle.
  * @param {string} name vehicle name
+ * @param {string} description vehicle description
  * @param {string} userid user ID
  * @returns {vehicle} vehicle
  */
-const vehicleCreate = async (name, userid) => {
+const vehicleCreate = async (name, description, userid) => {
   const query =
-    "INSERT INTO vehicle (name, createdby, modifiedby) VALUES(?,?,?)";
+    "INSERT INTO vehicle (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, userid]);
+    const result = await client.query(query, [
+      name,
+      description,
+      userid,
+      userid,
+    ]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create vehicle");
+    client.release();
+    console.error("error occurred while create vehicle: " + error);
     return error;
   }
 };

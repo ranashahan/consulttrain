@@ -7,13 +7,14 @@ const pool = require("./db.js");
  */
 const clientFind = async (name) => {
   const query = "select id from client where name=? limit 1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while client find");
+    client.release();
+    console.error("error occurred while client find: " + error);
     return error;
   }
 };
@@ -25,32 +26,35 @@ const clientFind = async (name) => {
  */
 const clientFindByID = async (id) => {
   const query = "select * from client where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while client find by id");
+    client.release();
+    console.error("error occurred while client find by id: " + error);
     return error;
   }
 };
 
 /**
  * This method will update client via userid
- * @param {string} name
- * @param {string} contactperson
- * @param {string} contactnumber
- * @param {string} address
- * @param {string} website
- * @param {string} agentname
- * @param {string} agentnumber
- * @param {number} userid
- * @param {number} id
+ * @param {string} name client name
+ * @param {string} description client description
+ * @param {string} contactperson client contact person
+ * @param {string} contactnumber client contact person mobile
+ * @param {string} address client address
+ * @param {string} website client website
+ * @param {string} agentname client agent name
+ * @param {string} agentnumber client agent number
+ * @param {number} userid user id
+ * @param {number} id client id
  * @returns {result} result
  */
 const clientUpdateByID = async (
   name,
+  description,
   contactperson,
   contactnumber,
   address,
@@ -61,12 +65,12 @@ const clientUpdateByID = async (
   id
 ) => {
   const query =
-    "UPDATE client SET name=?, contactperson=?, contactnumber=?,address=?,website=?,agentname=?,agentnumber=?, modifiedby=? where id=?";
-
+    "UPDATE client SET name=?,description=?, contactperson=?, contactnumber=?,address=?,website=?,agentname=?,agentnumber=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
+      description,
       contactperson,
       contactnumber,
       address,
@@ -79,7 +83,8 @@ const clientUpdateByID = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while client update by ID");
+    client.release();
+    console.error("error occurred while client update by ID: " + error);
     return error;
   }
 };
@@ -90,14 +95,14 @@ const clientUpdateByID = async (
  */
 const clientDeleteByID = async (id) => {
   const query = "DELETE FROM client where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while cliend delete by id");
+    client.release();
+    console.error("error occurred while cliend delete by id: " + error);
     return error;
   }
 };
@@ -108,31 +113,34 @@ const clientDeleteByID = async (id) => {
  */
 const clientAll = async () => {
   const query = "SELECT * FROM client;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all clients");
+    client.release();
+    console.error("error occurred while all clients: " + error);
     return error;
   }
 };
 
 /**
  * This method for create client.
- * @param {string} name
- * @param {string} contactperson
- * @param {string} contactnumber
- * @param {string} address
- * @param {string} website
- * @param {string} agentname
- * @param {string} agentnumber
+ * @param {string} name client name
+ * @param {string} description client description
+ * @param {string} contactperson client contact person
+ * @param {string} contactnumber client contact person mobile
+ * @param {string} address client address
+ * @param {string} website client website
+ * @param {string} agentname client agent name
+ * @param {string} agentnumber client agent mobile
  * @param {number} userid user ID
  * @returns {result} result
  */
 const clientCreate = async (
   name,
+  description,
   contactperson,
   contactnumber,
   address,
@@ -141,12 +149,13 @@ const clientCreate = async (
   agentnumber,
   userid
 ) => {
-  const query =
-    "INSERT INTO client (name, contactperson, contactnumber,address,website,agentname,agentnumber, createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?)";
+  const query = `INSERT INTO client (name, description, contactperson, contactnumber, address, website, agentname, agentnumber, createdby, modifiedby)
+     VALUES(?,?,?,?,?,?,?,?,?,?)`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
+      description,
       contactperson,
       contactnumber,
       address,
@@ -159,7 +168,8 @@ const clientCreate = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create client");
+    client.release();
+    console.error("error occurred while create client: " + error);
     return error;
   }
 };

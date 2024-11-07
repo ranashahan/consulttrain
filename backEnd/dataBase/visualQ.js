@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const visualFind = async (name) => {
   const query = "select id from visual where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while visual find");
+    client.release();
+    console.error("error occurred while visual find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const visualFind = async (name) => {
  */
 const visualFindByID = async (id) => {
   const query = "select * from visual where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while visual find by id");
+    client.release();
+    console.error("error occurred while visual find by id: " + error);
     return error;
   }
 };
@@ -40,20 +41,22 @@ const visualFindByID = async (id) => {
 /**
  * This method will update visual via userid
  * @param {string} name visual name
+ * @param {string} description visual description
  * @param {string} userid user userid as modified by
  * @param {int} id visual id
  * @returns {visual} visual
  */
-const visualUpdateByID = async (name, userid, id) => {
-  const query = "UPDATE visual SET name=?, modifiedby=? where id=?";
-
+const visualUpdateByID = async (name, description, userid, id) => {
+  const query =
+    "UPDATE visual SET name=?, description=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, id]);
+    const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while visual update by ID");
+    client.release();
+    console.error("error occurred while visual update by ID: " + error);
     return error;
   }
 };
@@ -64,14 +67,14 @@ const visualUpdateByID = async (name, userid, id) => {
  */
 const visualDeleteByID = async (id) => {
   const query = "DELETE FROM visual where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while visual delete: " + error);
     return error;
   }
 };
@@ -82,13 +85,14 @@ const visualDeleteByID = async (id) => {
  */
 const visualAll = async () => {
   const query = "SELECT * FROM visual;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all visual");
+    client.release();
+    console.error("error occurred while all visual: " + error);
     return error;
   }
 };
@@ -96,19 +100,26 @@ const visualAll = async () => {
 /**
  * This method for create visual.
  * @param {string} name visual name
+ * @param {string} description visual description
  * @param {string} userid user ID
  * @returns {visual} visual
  */
-const visualCreate = async (name, userid) => {
+const visualCreate = async (name, description, userid) => {
   const query =
-    "INSERT INTO visual (name, createdby, modifiedby) VALUES(?,?,?)";
+    "INSERT INTO visual (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, userid]);
+    const result = await client.query(query, [
+      name,
+      description,
+      userid,
+      userid,
+    ]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create visual");
+    client.release();
+    console.error("error occurred while create visual: " + error);
     return error;
   }
 };

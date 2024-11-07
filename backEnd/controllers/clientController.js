@@ -10,6 +10,7 @@ const createClient = asyncHandler(async (req, res) => {
   try {
     const {
       name,
+      description,
       contactperson,
       contactnumber,
       address,
@@ -31,6 +32,7 @@ const createClient = asyncHandler(async (req, res) => {
 
     const newclient = await db.clientCreate(
       name,
+      description,
       contactperson,
       contactnumber,
       address,
@@ -100,6 +102,7 @@ const updateClient = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const {
       name,
+      description,
       contactperson,
       contactnumber,
       address,
@@ -121,6 +124,7 @@ const updateClient = asyncHandler(async (req, res) => {
     }
     const result = await db.clientUpdateByID(
       name,
+      description,
       contactperson,
       contactnumber,
       address,

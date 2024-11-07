@@ -8,7 +8,7 @@ const db = require("../dataBase/titleQ");
  */
 const createTitle = asyncHandler(async (req, res) => {
   try {
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(422).json({
@@ -20,7 +20,7 @@ const createTitle = asyncHandler(async (req, res) => {
       return res.status(409).json({ message: name + " title already exists" });
     }
 
-    const newtitle = await db.titleCreate(name, userid);
+    const newtitle = await db.titleCreate(name, description, userid);
     const titleid = JSON.stringify(newtitle[0]);
 
     return res.status(201).json({
@@ -80,7 +80,7 @@ const getTitle = asyncHandler(async (req, res) => {
 const updateTitle = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -92,7 +92,7 @@ const updateTitle = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.titleUpdateByID(name, userid, id);
+    const result = await db.titleUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {

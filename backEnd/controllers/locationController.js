@@ -8,7 +8,7 @@ const db = require("../dataBase/locationQ");
  */
 const createlocation = asyncHandler(async (req, res) => {
   try {
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(422).json({
@@ -22,7 +22,7 @@ const createlocation = asyncHandler(async (req, res) => {
         .json({ message: name + " Location already exists" });
     }
 
-    const newLocation = await db.locationCreate(name, userid);
+    const newLocation = await db.locationCreate(name, description, userid);
     const locationid = JSON.stringify(newLocation[0]);
 
     return res.status(201).json({
@@ -65,7 +65,7 @@ const getlocation = asyncHandler(async (req, res) => {
     const result = await db.locationFindByID(id);
     if (!result.length > 0) {
       return res.status(422).json({
-        message: `wrong param (id ${id}) provided`,
+        message: `wrong param id (${id}) provided`,
       });
     }
     return res.status(200).json(result);
@@ -82,7 +82,7 @@ const getlocation = asyncHandler(async (req, res) => {
 const updatelocation = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -94,7 +94,7 @@ const updatelocation = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.locationUpdateByID(name, userid, id);
+    const result = await db.locationUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {

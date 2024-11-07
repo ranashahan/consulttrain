@@ -26,6 +26,7 @@ const createDriver = asyncHandler(async (req, res) => {
       visualid,
       ddccount,
       experience,
+      code,
       comment,
       userid,
     } = req.body;
@@ -70,6 +71,7 @@ const createDriver = asyncHandler(async (req, res) => {
       visualid,
       ddccount,
       experience,
+      code,
       comment,
       userid
     );
@@ -271,6 +273,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       visualid,
       ddccount,
       experience,
+      code,
       comment,
       userid,
     } = req.body;
@@ -303,6 +306,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       visualid,
       ddccount,
       experience,
+      code,
       comment,
       userid,
       id

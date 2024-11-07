@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const trainerFind = async (name) => {
   const query = "select id from trainer where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while trainerFind");
+    client.release();
+    console.error("error occurred while trainer find: " + error);
     return error;
   }
 };
@@ -25,15 +25,15 @@ const trainerFind = async (name) => {
  */
 const trainerinitialsFind = async (initials) => {
   const query = "select initials from trainer where initials=? limit 1";
-  console.log(initials);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [initials]);
     client.release();
     console.log(result[0]);
     return result[0];
   } catch (error) {
-    console.log("error occurred while trainerinitialsFind");
+    client.release();
+    console.error("error occurred while trainerinitials find: " + error);
     return error;
   }
 };
@@ -45,13 +45,14 @@ const trainerinitialsFind = async (initials) => {
  */
 const trainerFindByID = async (id) => {
   const query = "select * from trainer where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while trainer find by id");
+    client.release();
+    console.error("error occurred while trainer find by id: " + error);
     return error;
   }
 };
@@ -76,9 +77,8 @@ const trainerUpdateByID = async (
 ) => {
   const query =
     "UPDATE trainer SET name=?, initials=?, mobile=?, address=?, modifiedby=? where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       initials,
@@ -90,7 +90,8 @@ const trainerUpdateByID = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while trainer update by ID");
+    client.release();
+    console.error("error occurred while trainer update by ID: " + error);
     return error;
   }
 };
@@ -101,14 +102,14 @@ const trainerUpdateByID = async (
  */
 const trainerDeleteByID = async (id) => {
   const query = "DELETE FROM trainer where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while trainer Delete By ID");
+    client.release();
+    console.error("error occurred while trainer Delete By ID: " + error);
     return error;
   }
 };
@@ -119,13 +120,14 @@ const trainerDeleteByID = async (id) => {
  */
 const trainerAll = async () => {
   const query = "SELECT * FROM trainer;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all trainers");
+    client.release();
+    console.error("error occurred while all trainers: " + error);
     return error;
   }
 };
@@ -142,8 +144,8 @@ const trainerAll = async () => {
 const trainerCreate = async (name, initials, mobile, address, userid) => {
   const query =
     "INSERT INTO trainer (name, initials, mobile, address, createdby, modifiedby) VALUES(?,?,?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       initials,
@@ -155,7 +157,8 @@ const trainerCreate = async (name, initials, mobile, address, userid) => {
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create trainer");
+    client.release();
+    console.error("error occurred while create trainer: " + error);
     return error;
   }
 };

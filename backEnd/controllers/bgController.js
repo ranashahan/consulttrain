@@ -8,7 +8,7 @@ const db = require("../dataBase/bgQ");
  */
 const createBloodgroup = asyncHandler(async (req, res) => {
   try {
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(422).json({
@@ -20,7 +20,7 @@ const createBloodgroup = asyncHandler(async (req, res) => {
       return res.status(409).json({ message: "Bloodgroup already exists" });
     }
 
-    const newBloodGroup = await db.bgCreate(name, userid);
+    const newBloodGroup = await db.bgCreate(name, description, userid);
     const bloodgroupID = JSON.stringify(newBloodGroup[0]);
 
     return res.status(201).json({
@@ -80,7 +80,7 @@ const getBloodgroup = asyncHandler(async (req, res) => {
 const updateBloodgroup = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -92,7 +92,7 @@ const updateBloodgroup = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.bgUpdateByID(name, userid, id);
+    const result = await db.bgUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {

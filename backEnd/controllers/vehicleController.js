@@ -8,7 +8,7 @@ const db = require("../dataBase/vehicleQ");
  */
 const createVehicle = asyncHandler(async (req, res) => {
   try {
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(422).json({
@@ -22,7 +22,7 @@ const createVehicle = asyncHandler(async (req, res) => {
         .json({ message: name + " vehicle already exists" });
     }
 
-    const newvehicle = await db.vehicleCreate(name, userid);
+    const newvehicle = await db.vehicleCreate(name, description, userid);
     const vehicleid = JSON.stringify(newvehicle[0]);
 
     return res.status(201).json({
@@ -82,7 +82,7 @@ const getVehicle = asyncHandler(async (req, res) => {
 const updateVehicle = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -94,7 +94,7 @@ const updateVehicle = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.vehicleUpdateByID(name, userid, id);
+    const result = await db.vehicleUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {

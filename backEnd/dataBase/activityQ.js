@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const activityFind = async (name) => {
   const query = "select id from activity where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while activity find");
+    client.release();
+    console.error("error occurred while activity find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const activityFind = async (name) => {
  */
 const activityFindByID = async (id) => {
   const query = "select * from activity where id=? and active=1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while activity find by id");
+    client.release();
+    console.error("error occurred while activity find by id: " + error);
     return error;
   }
 };
@@ -42,15 +43,16 @@ const activityFindByID = async (id) => {
  * @returns response
  */
 const activityFindBySlaveID = async (id) => {
-  const query =
-    "select id,name,description,initials,slavecategoryid from activity where slavecategoryid = ? and active=1";
+  const query = `select id,name,description,initials,orderid,slavecategoryid from activity 
+    where slavecategoryid = ? and active=1 order by orderid asc`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while activity find by slave id");
+    client.release();
+    console.error("error occurred while activity find by slave id: " + error);
     return error;
   }
 };
@@ -60,6 +62,7 @@ const activityFindBySlaveID = async (id) => {
  * @param {string} name activity name
  * @param {string} description activity description
  * @param {string} initials activity initials
+ * @param {number} orderid activity orderid
  * @param {number} slavecategoryid slave category id
  * @param {string} userid user userid as modified by
  * @param {int} id activity id
@@ -69,19 +72,20 @@ const activityUpdateByID = async (
   name,
   description,
   initials,
+  orderid,
   slavecategoryid,
   userid,
   id
 ) => {
   const query =
-    "UPDATE activity SET name=?,description=?,initials=?, slavecategoryid=?, modifiedby=? where id=?";
-
+    "UPDATE activity SET name=?,description=?,initials=?, orderid=?, slavecategoryid=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       description,
       initials,
+      orderid,
       slavecategoryid,
       userid,
       id,
@@ -89,7 +93,8 @@ const activityUpdateByID = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while activity update by ID");
+    client.release();
+    console.error("error occurred while activity update by ID: " + error);
     return error;
   }
 };
@@ -100,14 +105,14 @@ const activityUpdateByID = async (
  */
 const activityDeleteByID = async (userid, id) => {
   const query = "UPDATE activity SET active=0, modifiedby=? where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while activity delete");
+    client.release();
+    console.error("error occurred while activity delete: " + error);
     return error;
   }
 };
@@ -118,13 +123,14 @@ const activityDeleteByID = async (userid, id) => {
  */
 const activityAll = async () => {
   const query = "SELECT * FROM activity where active=1;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all activitys");
+    client.release();
+    console.error("error occurred while all activitys: " + error);
     return error;
   }
 };
@@ -134,7 +140,8 @@ const activityAll = async () => {
  * @param {string} name activity name
  * @param {string} description activity description
  * @param {string} initials activity initials
- * @param {number} mastercategoryid master category id
+ * @param {number} orderid category orderid
+ * @param {number} slavecategoryid slave category id
  * @param {number} userid user ID
  * @returns {result} result
  */
@@ -142,17 +149,19 @@ const activityCreate = async (
   name,
   description,
   initials,
+  orderid,
   slavecategoryid,
   userid
 ) => {
   const query =
-    "INSERT INTO activity (name, description,initials, slavecategoryid, createdby, modifiedby) VALUES(?,?,?,?,?,?)";
+    "INSERT INTO activity (name, description,initials, orderid, slavecategoryid, createdby, modifiedby) VALUES(?,?,?,?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       description,
       initials,
+      orderid,
       slavecategoryid,
       userid,
       userid,
@@ -160,7 +169,8 @@ const activityCreate = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while activity user");
+    client.release();
+    console.error("error occurred while create activity: " + error);
     return error;
   }
 };

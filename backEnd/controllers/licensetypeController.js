@@ -6,21 +6,21 @@ const db = require("../dataBase/licensetypeQ");
  * @route POST /api/dltype/create
  * @access private
  */
-const createdltype = asyncHandler(async (req, res) => {
+const createDLType = asyncHandler(async (req, res) => {
   try {
-    const { type, userid } = req.body;
+    const { name, description, userid } = req.body;
 
-    if (!type || !userid) {
+    if (!name || !userid) {
       return res.status(422).json({
-        message: "Please fill in all fields (DLType and userid)",
+        message: "Please fill in all fields (DLType name and userid)",
       });
     }
-    const [dltypeid] = await db.dlTypeFind(type);
+    const [dltypeid] = await db.dlTypeFind(name);
     if (dltypeid) {
-      return res.status(409).json({ message: type + " DLType already exists" });
+      return res.status(409).json({ message: name + " DLType already exists" });
     }
 
-    const newDLtype = await db.dlTypeCreate(type, userid);
+    const newDLtype = await db.dlTypeCreate(name, description, userid);
     const dlid = JSON.stringify(newDLtype[0]);
 
     return res.status(201).json({
@@ -38,7 +38,7 @@ const createdltype = asyncHandler(async (req, res) => {
  * @route GET /api/dltype/getAll
  * @access private
  */
-const getdltypes = asyncHandler(async (req, res) => {
+const getDLTypes = asyncHandler(async (req, res) => {
   try {
     const result = await db.dlTypeAll();
     return res.status(200).json(result);
@@ -52,7 +52,7 @@ const getdltypes = asyncHandler(async (req, res) => {
  * @route GET /api/dltype/:id
  * @access private
  */
-const getdltype = asyncHandler(async (req, res) => {
+const getDLType = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
@@ -77,10 +77,10 @@ const getdltype = asyncHandler(async (req, res) => {
  * @route PUT /api/dltype/:id
  * @access private
  */
-const updatedltype = asyncHandler(async (req, res) => {
+const updateDLType = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { type, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -92,7 +92,7 @@ const updatedltype = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.dlTypeUpdateByID(type, userid, id);
+    const result = await db.dlTypeUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {
@@ -104,7 +104,7 @@ const updatedltype = asyncHandler(async (req, res) => {
  * @route DELETE /api/dltype/:id
  * @access private
  */
-const deletedltype = asyncHandler(async (req, res) => {
+const deleteDLType = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
@@ -126,9 +126,9 @@ const deletedltype = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  createdltype,
-  getdltypes,
-  deletedltype,
-  updatedltype,
-  getdltype,
+  createDLType,
+  getDLTypes,
+  deleteDLType,
+  updateDLType,
+  getDLType,
 };

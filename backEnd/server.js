@@ -4,7 +4,7 @@ const cors = require("cors");
 const errorHandler = require("./middleware/errorHandler");
 const path = require("path");
 const dotenv = require("dotenv").config();
-const connectToDataBase = require("./dataBase/db.js");
+const pool = require("./dataBase/db.js");
 const app = express();
 
 const port = process.env.PORT || 5000;
@@ -46,8 +46,8 @@ app.use("/api/assessment", require("./routes/assessmentRoutes.js"));
 // });
 app.use(errorHandler);
 
-connectToDataBase
-  .connectToDataBase()
+pool
+  .getConnection()
   .then(() => {
     app.listen(port, () => {
       console.log(`Server is running against ${port}`);

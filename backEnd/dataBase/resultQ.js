@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const resultFind = async (name) => {
   const query = "select id from result where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while result find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const resultFind = async (name) => {
  */
 const resultFindByID = async (id) => {
   const query = "select * from result where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while user find by id");
+    client.release();
+    console.error("error occurred while result find by id: " + error);
     return error;
   }
 };
@@ -44,16 +45,17 @@ const resultFindByID = async (id) => {
  * @param {int} id result id
  * @returns {result} result
  */
-const resultUpdateByID = async (name, userid, id) => {
-  const query = "UPDATE result SET name=?, modifiedby=? where id=?";
-
+const resultUpdateByID = async (name, description, userid, id) => {
+  const query =
+    "UPDATE result SET name=?, description=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, id]);
+    const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while user update by ID");
+    client.release();
+    console.error("error occurred while result update by ID: " + error);
     return error;
   }
 };
@@ -64,14 +66,14 @@ const resultUpdateByID = async (name, userid, id) => {
  */
 const resultDeleteByID = async (id) => {
   const query = "DELETE FROM result where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while result delete: " + error);
     return error;
   }
 };
@@ -82,13 +84,14 @@ const resultDeleteByID = async (id) => {
  */
 const resultAll = async () => {
   const query = "SELECT * FROM result;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all users");
+    client.release();
+    console.error("error occurred while all results: " + error);
     return error;
   }
 };
@@ -96,19 +99,26 @@ const resultAll = async () => {
 /**
  * This method for create result.
  * @param {string} name result name
+ * @param {string} description result description
  * @param {string} userid user ID
  * @returns {result} result
  */
-const resultCreate = async (name, userid) => {
+const resultCreate = async (name, description, userid) => {
   const query =
-    "INSERT INTO result (name, createdby, modifiedby) VALUES(?,?,?)";
+    "INSERT INTO result (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, userid]);
+    const result = await client.query(query, [
+      name,
+      description,
+      userid,
+      userid,
+    ]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create user");
+    client.release();
+    console.error("error occurred while create result: " + error);
     return error;
   }
 };

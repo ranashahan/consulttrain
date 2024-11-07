@@ -10,7 +10,8 @@ const dbActivity = require("../dataBase/activityQ");
  */
 const createSlaveCategory = asyncHandler(async (req, res) => {
   try {
-    const { name, description, initials, mastercategoryid, userid } = req.body;
+    const { name, description, initials, orderid, mastercategoryid, userid } =
+      req.body;
 
     if (!name || !mastercategoryid || !userid) {
       return res.status(422).json({
@@ -36,6 +37,7 @@ const createSlaveCategory = asyncHandler(async (req, res) => {
       name,
       description,
       initials,
+      orderid,
       mastercategoryid,
       userid
     );
@@ -98,7 +100,8 @@ const getSlaveCategory = asyncHandler(async (req, res) => {
 const updateSlaveCategory = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, description, initials, mastercategoryid, userid } = req.body;
+    const { name, description, initials, orderid, mastercategoryid, userid } =
+      req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -122,6 +125,7 @@ const updateSlaveCategory = asyncHandler(async (req, res) => {
       name,
       description,
       initials,
+      orderid,
       mastercategoryid,
       userid,
       id
