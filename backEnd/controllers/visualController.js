@@ -8,7 +8,7 @@ const db = require("../dataBase/visualQ");
  */
 const createVisual = asyncHandler(async (req, res) => {
   try {
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(422).json({
@@ -20,7 +20,7 @@ const createVisual = asyncHandler(async (req, res) => {
       return res.status(409).json({ message: name + " visual already exists" });
     }
 
-    const newvisual = await db.visualCreate(name, userid);
+    const newvisual = await db.visualCreate(name, description, userid);
     const visualid = JSON.stringify(newvisual[0]);
 
     return res.status(201).json({
@@ -80,7 +80,7 @@ const getVisual = asyncHandler(async (req, res) => {
 const updateVisual = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -92,13 +92,14 @@ const updateVisual = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.visualUpdateByID(name, userid, id);
+    const result = await db.visualUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {
     res.status(500);
   }
 });
+
 /**
  * @description delete visual against param id
  * @route DELETE /api/visual/:id

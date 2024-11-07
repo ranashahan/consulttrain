@@ -8,7 +8,7 @@ const db = require("../dataBase/resultQ");
  */
 const createResult = asyncHandler(async (req, res) => {
   try {
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(422).json({
@@ -22,7 +22,7 @@ const createResult = asyncHandler(async (req, res) => {
         .json({ message: name + " Location already exists" });
     }
 
-    const newResult = await db.resultCreate(name, userid);
+    const newResult = await db.resultCreate(name, description, userid);
     const resultid = JSON.stringify(newResult[0]);
 
     return res.status(201).json({
@@ -82,7 +82,7 @@ const getResult = asyncHandler(async (req, res) => {
 const updateResult = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -94,7 +94,7 @@ const updateResult = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.resultUpdateByID(name, userid, id);
+    const result = await db.resultUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {

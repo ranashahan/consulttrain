@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const bgFind = async (name) => {
   const query = "select id from bloodgroup where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while bloodgroup find");
+    client.release();
+    console.error("error occurred while bloodgroup find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const bgFind = async (name) => {
  */
 const bgFindByID = async (id) => {
   const query = "select * from bloodgroup where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while bloodgroup find by id");
+    client.release();
+    console.error("error occurred while bloodgroup find by id: " + error);
     return error;
   }
 };
@@ -40,20 +41,22 @@ const bgFindByID = async (id) => {
 /**
  * This method will update bloodgroup via userid
  * @param {string} name bloodgroup name
+ * @param {string} description bloodgroup description
  * @param {string} userid user userid as modified by
  * @param {int} id bloodgroup id
  * @returns {result} result
  */
-const bgUpdateByID = async (name, userid, id) => {
-  const query = "UPDATE bloodgroup SET name=?, modifiedby=? where id=?";
-
+const bgUpdateByID = async (name, description, userid, id) => {
+  const query =
+    "UPDATE bloodgroup SET name=?, description=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, id]);
+    const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while bloodgroup update by ID");
+    client.release();
+    console.error("error occurred while bloodgroup update by ID: " + error);
     return error;
   }
 };
@@ -63,15 +66,15 @@ const bgUpdateByID = async (name, userid, id) => {
  * @returns {result} result
  */
 const bgDeleteByID = async (id) => {
-  const query = "DELETE FROM bloodgroup  where id=?";
-
+  const query = "DELETE FROM bloodgroup where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while delete bloodgroup");
+    client.release();
+    console.error("error occurred while delete bloodgroup: " + error);
     return error;
   }
 };
@@ -82,13 +85,14 @@ const bgDeleteByID = async (id) => {
  */
 const bgAll = async () => {
   const query = "CALL `consulttrain`.`getAllBloodGroup`();";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while all bloodgroups");
+    client.release();
+    console.error("error occurred while all bloodgroups: " + error);
     return error;
   }
 };
@@ -96,19 +100,26 @@ const bgAll = async () => {
 /**
  * This method for create bloodgroup.
  * @param {string} name bloodgroup name
+ * @param {string} description bloodgroup description
  * @param {string} userid user ID
  * @returns {result} result
  */
-const bgCreate = async (name, userid) => {
+const bgCreate = async (name, description, userid) => {
   const query =
-    "INSERT INTO bloodgroup (name, createdby, modifiedby) VALUES(?,?,?)";
+    "INSERT INTO bloodgroup (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, userid]);
+    const result = await client.query(query, [
+      name,
+      description,
+      userid,
+      userid,
+    ]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create bloodgroup");
+    client.release();
+    console.error("error occurred while create bloodgroup: " + error);
     return error;
   }
 };

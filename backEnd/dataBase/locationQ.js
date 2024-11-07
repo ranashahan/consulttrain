@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const locationFind = async (name) => {
   const query = "select id from location where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while location find");
+    client.release();
+    console.error("error occurred while location find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const locationFind = async (name) => {
  */
 const locationFindByID = async (id) => {
   const query = "select * from location where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while location find by id");
+    client.release();
+    console.error("error occurred while location find by id: " + error);
     return error;
   }
 };
@@ -40,20 +41,22 @@ const locationFindByID = async (id) => {
 /**
  * This method will update location via userid
  * @param {string} name location name
+ * @param {string} description location description
  * @param {string} userid user userid as modified by
  * @param {int} id location id
  * @returns {result} result
  */
-const locationUpdateByID = async (name, userid, id) => {
-  const query = "UPDATE location SET name=?, modifiedby=? where id=?";
-
+const locationUpdateByID = async (name, description, userid, id) => {
+  const query =
+    "UPDATE location SET name=?, description=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, id]);
+    const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while location update by ID");
+    client.release();
+    console.error("error occurred while location update by ID: " + error);
     return error;
   }
 };
@@ -64,14 +67,14 @@ const locationUpdateByID = async (name, userid, id) => {
  */
 const locationDeleteByID = async (id) => {
   const query = "DELETE FROM location where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while location delete by id");
+    client.release();
+    console.error("error occurred while location delete by id: " + error);
     return error;
   }
 };
@@ -81,14 +84,15 @@ const locationDeleteByID = async (id) => {
  * @returns {result} result
  */
 const locationAll = async () => {
-  const query = "SELECT * FROM location;";
+  const query = "SELECT * FROM location order by name asc;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all locations");
+    client.release();
+    console.error("error occurred while all locations: " + error);
     return error;
   }
 };
@@ -96,19 +100,26 @@ const locationAll = async () => {
 /**
  * This method for create location.
  * @param {string} name location name
+ * @param {string} description location description
  * @param {string} userid user ID
  * @returns {result} result
  */
-const locationCreate = async (name, userid) => {
+const locationCreate = async (name, description, userid) => {
   const query =
-    "INSERT INTO location (name, createdby, modifiedby) VALUES(?,?,?)";
+    "INSERT INTO location (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, userid]);
+    const result = await client.query(query, [
+      name,
+      description,
+      userid,
+      userid,
+    ]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create location");
+    client.release();
+    console.error("error occurred while create location: " + error);
     return error;
   }
 };

@@ -5,18 +5,19 @@ const pool = require("./db.js");
  * @returns {result} result
  */
 const dashboardLoactionCount = async () => {
-  const query = `SELECT l.name AS location_name, COUNT(s.id) AS session_count FROM session s
-JOIN location l ON s.locationid = l.id
-GROUP BY l.name;`;
-  //   console.log(email);
+  const query = `SELECT l.name AS location_name, COUNT(s.id) AS session_count FROM session s 
+  JOIN location l ON s.locationid = l.id 
+  where s.active = 1 
+  GROUP BY l.name;`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
-    client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while dashboard location count");
+    console.error("error occurred while dashboard location count: " + error);
     return error;
+  } finally {
+    client.release();
   }
 };
 /**
@@ -25,14 +26,16 @@ GROUP BY l.name;`;
  */
 const dashboardDriverSessionCount = async () => {
   const query = `CALL getdashboard_counts();`;
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while dashboard driver & session count");
+    client.release();
+    console.error(
+      "error occurred while dashboard driver & session count: " + error
+    );
     return error;
   }
 };
@@ -42,14 +45,16 @@ const dashboardDriverSessionCount = async () => {
  */
 const dashboardTrainSessionCount = async () => {
   const query = `CALL getdashboard_Trainer();`;
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0][0];
   } catch (error) {
-    console.log("error occurred while dashboard driver & session count");
+    client.release();
+    console.error(
+      "error occurred while dashboard trainer & session count: " + error
+    );
     return error;
   }
 };

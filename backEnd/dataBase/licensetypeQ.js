@@ -2,18 +2,19 @@ const pool = require("./db.js");
 
 /**
  * This method for fetch dltype via type
- * @param {string} type dl type
+ * @param {string} name dl type
  * @returns {result} result
  */
-const dlTypeFind = async (type) => {
-  const query = "select id from licensetype where type=? limit 1";
+const dlTypeFind = async (name) => {
+  const query = "select id from licensetype where name=? limit 1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [type]);
+    const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while dltype find: " + error);
     return error;
   }
 };
@@ -25,34 +26,37 @@ const dlTypeFind = async (type) => {
  */
 const dlTypeFindByID = async (id) => {
   const query = "select * from licensetype where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while user find by id");
+    client.release();
+    console.error("error occurred while dltype find by id: " + error);
     return error;
   }
 };
 
 /**
  * This method will update DL Type by ID
- * @param {string} type DL type
+ * @param {string} name DL type
+ * @param {string} description DL type description
  * @param {string} userid user userid as modified by
  * @param {int} id licensetype id
  * @returns {result} result
  */
-const dlTypeUpdateByID = async (type, userid, id) => {
-  const query = "UPDATE licensetype SET type=?, modifiedby=? where id=?";
-
+const dlTypeUpdateByID = async (name, description, userid, id) => {
+  const query =
+    "UPDATE licensetype SET name=?,description=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [type, userid, id]);
+    const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while user update by ID");
+    client.release();
+    console.error("error occurred while dltype update by ID: " + error);
     return error;
   }
 };
@@ -63,14 +67,14 @@ const dlTypeUpdateByID = async (type, userid, id) => {
  */
 const dlTypeDeleteByID = async (id) => {
   const query = "DELETE FROM licensetype where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while dltype delete: " + error);
     return error;
   }
 };
@@ -81,33 +85,41 @@ const dlTypeDeleteByID = async (id) => {
  */
 const dlTypeAll = async () => {
   const query = "SELECT * FROM licensetype;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all users");
+    client.release();
+    console.error("error occurred while all dltypes: " + error);
     return error;
   }
 };
 
 /**
  * This method for create licensetype.
- * @param {string} type DL type
+ * @param {string} name DL type name
+ * @param {string} description DL type description
  * @param {string} userid user ID
  * @returns {result} result
  */
-const dlTypeCreate = async (type, userid) => {
+const dlTypeCreate = async (name, description, userid) => {
   const query =
-    "INSERT INTO licensetype (type, createdby, modifiedby) VALUES(?,?,?)";
+    "INSERT INTO licensetype (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [type, userid, userid]);
+    const result = await client.query(query, [
+      name,
+      description,
+      userid,
+      userid,
+    ]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create user");
+    client.release();
+    console.error("error occurred while create dltype: " + error);
     return error;
   }
 };

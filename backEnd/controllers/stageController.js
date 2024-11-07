@@ -8,7 +8,7 @@ const db = require("../dataBase/stageQ");
  */
 const createStage = asyncHandler(async (req, res) => {
   try {
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(422).json({
@@ -20,7 +20,7 @@ const createStage = asyncHandler(async (req, res) => {
       return res.status(409).json({ message: name + " stage already exists" });
     }
 
-    const newstage = await db.stageCreate(name, userid);
+    const newstage = await db.stageCreate(name, description, userid);
     const stageid = JSON.stringify(newstage[0]);
 
     return res.status(201).json({
@@ -80,7 +80,7 @@ const getStage = asyncHandler(async (req, res) => {
 const updateStage = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, userid } = req.body;
+    const { name, description, userid } = req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -92,13 +92,14 @@ const updateStage = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.stageUpdateByID(name, userid, id);
+    const result = await db.stageUpdateByID(name, description, userid, id);
 
     return res.status(201).json(result);
   } catch (error) {
     res.status(500);
   }
 });
+
 /**
  * @description delete stage against param id
  * @route DELETE /api/stage/:id

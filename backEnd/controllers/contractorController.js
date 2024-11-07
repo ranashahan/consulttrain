@@ -11,6 +11,7 @@ const createContractor = asyncHandler(async (req, res) => {
   try {
     const {
       name,
+      description,
       ntnnumber,
       contactname,
       contactnumber,
@@ -37,6 +38,7 @@ const createContractor = asyncHandler(async (req, res) => {
 
     const newContractor = await db.contractorCreate(
       name,
+      description,
       ntnnumber,
       contactname,
       contactnumber,
@@ -113,6 +115,7 @@ const updateContractor = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const {
       name,
+      description,
       ntnnumber,
       contactname,
       contactnumber,
@@ -140,6 +143,7 @@ const updateContractor = asyncHandler(async (req, res) => {
 
     const result = await db.contractorUpdateByID(
       name,
+      description,
       ntnnumber,
       contactname,
       contactnumber,

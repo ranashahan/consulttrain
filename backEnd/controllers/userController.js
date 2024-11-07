@@ -23,7 +23,6 @@ const registerUser = asyncHandler(async (req, res) => {
       imagepath,
       role,
     } = req.body.obj;
-    console.log(req.body);
 
     if (!username || !name || !email || !password) {
       return res.status(422).json({
@@ -318,7 +317,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       config.refreshTokenSecret
     );
 
-    console.log(decodedRefreshToken.userid);
+    //console.log(decodedRefreshToken.userid);
     const userid = decodedRefreshToken.userid;
     const userRefreshToken = await db.findRefreshToken(userid, refreshToken);
 

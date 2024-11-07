@@ -1,7 +1,7 @@
 {
-  "name": "restapiauth",
-  "version": "1.0.0",
-  "description": "",
+  "name": "consulttrainbackend",
+  "version": "1.0.1",
+  "description": "This is the backend of consult & train software built by Rana Mansoor Ahmed",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

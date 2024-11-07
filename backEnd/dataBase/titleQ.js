@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const titleFind = async (name) => {
   const query = "select id from title where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while title find");
+    client.release();
+    console.error("error occurred while title find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const titleFind = async (name) => {
  */
 const titleFindByID = async (id) => {
   const query = "select * from title where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while title find by id");
+    client.release();
+    console.error("error occurred while title find by id: " + error);
     return error;
   }
 };
@@ -40,20 +41,22 @@ const titleFindByID = async (id) => {
 /**
  * This method will update title via userid
  * @param {string} name title name
+ * @param {string} description title description
  * @param {string} userid user userid as modified by
  * @param {int} id title id
  * @returns {title} title
  */
-const titleUpdateByID = async (name, userid, id) => {
-  const query = "UPDATE title SET name=?, modifiedby=? where id=?";
-
+const titleUpdateByID = async (name, description, userid, id) => {
+  const query =
+    "UPDATE title SET name=?, description=?, modifiedby=? where id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, id]);
+    const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while title update by ID");
+    client.release();
+    console.error("error occurred while title update by ID: " + error);
     return error;
   }
 };
@@ -64,14 +67,14 @@ const titleUpdateByID = async (name, userid, id) => {
  */
 const titleDeleteByID = async (id) => {
   const query = "DELETE FROM title where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while title delete: " + error);
     return error;
   }
 };
@@ -82,13 +85,14 @@ const titleDeleteByID = async (id) => {
  */
 const titleAll = async () => {
   const query = "SELECT * FROM title;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all title");
+    client.release();
+    console.error("error occurred while all title: " + error);
     return error;
   }
 };
@@ -96,18 +100,26 @@ const titleAll = async () => {
 /**
  * This method for create title.
  * @param {string} name title name
+ * @param {string} description title description
  * @param {string} userid user ID
  * @returns {title} title
  */
-const titleCreate = async (name, userid) => {
-  const query = "INSERT INTO title (name, createdby, modifiedby) VALUES(?,?,?)";
+const titleCreate = async (name, description, userid) => {
+  const query =
+    "INSERT INTO title (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
-    const result = await client.query(query, [name, userid, userid]);
+    const result = await client.query(query, [
+      name,
+      description,
+      userid,
+      userid,
+    ]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create title");
+    client.release();
+    console.error("error occurred while create title: " + error);
     return error;
   }
 };

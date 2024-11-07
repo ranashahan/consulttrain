@@ -8,17 +8,18 @@ const pool = require("./db.js");
 const userFind = async (email) => {
   const query =
     "select userid,username,email,password,role from users where email=? and active=1 limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [email]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.error("error occurred while userfind: " + error);
     return error;
   }
 };
+
 /**
  * This method for fetch user via name
  * @param {string} username user name
@@ -27,14 +28,14 @@ const userFind = async (email) => {
 const findbyUsername = async (username) => {
   const query =
     "select username from users where username=? and active = 1 limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [username]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while find by Username");
+    client.release();
+    console.error("error occurred while find by Username: " + error);
     return error;
   }
 };
@@ -46,13 +47,14 @@ const findbyUsername = async (username) => {
  */
 const userFindByID = async (id) => {
   const query = "select * from users where userid=? and active = 1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while user find by id");
+    client.release();
+    console.error("error occurred while user find by id: " + error);
     return error;
   }
 };
@@ -81,9 +83,8 @@ const userUpdateByID = async (
 ) => {
   const query =
     "UPDATE users SET name=?, mobile=?, company=?, designation=?,imagepath=?, role=?, modifiedby=? where userid=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       mobile,
@@ -97,7 +98,8 @@ const userUpdateByID = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while user update by ID");
+    client.release();
+    console.error("error occurred while user update by ID: " + error);
     return error;
   }
 };
@@ -111,13 +113,14 @@ const userUpdateByID = async (
  */
 const userUpdatePasswordByID = async (password, userid, id) => {
   const query = "UPDATE users SET password=?, modifiedby=? where userid=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [password, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while user update password by ID");
+    client.release();
+    console.error("error occurred while user update password by ID: " + error);
     return error;
   }
 };
@@ -129,14 +132,14 @@ const userUpdatePasswordByID = async (password, userid, id) => {
  */
 const userDeleteByID = async (id) => {
   const query = "update users set active = 0 where userid=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while userfind");
+    client.release();
+    console.log("error occurred while user delete: " + error);
     return error;
   }
 };
@@ -147,13 +150,14 @@ const userDeleteByID = async (id) => {
  */
 const allUsers = async () => {
   const query = "select * from users where active=1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all users");
+    client.release();
+    console.error("error occurred while all users: " + error);
     return error;
   }
 };
@@ -184,8 +188,8 @@ const createUser = async (
 ) => {
   const query =
     "INSERT INTO users (username, email, password, name, mobile, company, designation,imagepath, role, createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       username,
       email,
@@ -202,10 +206,12 @@ const createUser = async (
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create user");
+    client.release();
+    console.error("error occurred while create user: " + error);
     return error;
   }
 };
+
 /**
  * This method will insert record into refreshtoken table
  * @param {string} userid user userid
@@ -214,18 +220,20 @@ const createUser = async (
  */
 const createRefreshToken = async (userid, refreshToken) => {
   const query = "INSERT INTO refreshtoken (userid, refreshtoken) VALUES(?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [userid, refreshToken]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create refresh token");
+    client.release();
+    console.error("error occurred while create refresh token: " + error);
     return error;
   }
 };
+
 /**
- *
+ * This method for find refresh token
  * @param {string} userid user userid
  * @param {string} refreshToken user refresh token
  * @returns {result} result
@@ -233,30 +241,33 @@ const createRefreshToken = async (userid, refreshToken) => {
 const findRefreshToken = async (userid, refreshToken) => {
   const query =
     "select * from refreshtoken where userid = ? and refreshtoken=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [userid, refreshToken]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while find refresh token");
+    client.release();
+    console.error("error occurred while find refresh token: " + error);
     return error;
   }
 };
+
 /**
- *
+ * This method for delete refresh token
  * @param {string} userid user userid
  * @returns {result} result
  */
 const deleteRefreshToken = async (userid) => {
   const query = "DELETE FROM refreshtoken where userid = ?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [userid]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while delete refresh token");
+    client.release();
+    console.error("error occurred while delete refresh token: " + error);
     return error;
   }
 };

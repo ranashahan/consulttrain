@@ -7,14 +7,14 @@ const pool = require("./db.js");
  */
 const mcFind = async (name) => {
   const query = "select id from mastercategory where name=? limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while mastercategory find");
+    client.release();
+    console.error("error occurred while mastercategory find: " + error);
     return error;
   }
 };
@@ -26,13 +26,14 @@ const mcFind = async (name) => {
  */
 const mcFindByID = async (id) => {
   const query = "select * from mastercategory where id=? and active=1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while mastercategory find by id");
+    client.release();
+    console.error("error occurred while mastercategory find by id: " + error);
     return error;
   }
 };
@@ -48,14 +49,14 @@ const mcFindByID = async (id) => {
 const mcUpdateByID = async (name, description, userid, id) => {
   const query =
     "UPDATE mastercategory SET name=?,description=?, modifiedby=? where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name, description, userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while mastercategory update by ID");
+    client.release();
+    console.error("error occurred while mastercategory update by ID: " + error);
     return error;
   }
 };
@@ -66,14 +67,14 @@ const mcUpdateByID = async (name, description, userid, id) => {
  */
 const mcDeleteByID = async (userid, id) => {
   const query = "UPDATE mastercategory SET active=0, modifiedby=? where id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [userid, id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while mastercategory delete");
+    client.release();
+    console.error("error occurred while mastercategory delete: " + error);
     return error;
   }
 };
@@ -84,13 +85,14 @@ const mcDeleteByID = async (userid, id) => {
  */
 const mcAll = async () => {
   const query = "SELECT * FROM mastercategory where active=1;";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all mastercategory");
+    client.release();
+    console.error("error occurred while all mastercategory: " + error);
     return error;
   }
 };
@@ -104,9 +106,9 @@ const mcAll = async () => {
  */
 const mcCreate = async (name, description, userid) => {
   const query =
-    "INSERT INTO mastercategory (name,description, createdby, modifiedby) VALUES(?,?,?,?)";
+    "INSERT INTO mastercategory (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [
       name,
       description,
@@ -116,7 +118,8 @@ const mcCreate = async (name, description, userid) => {
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while mastercategory user");
+    client.release();
+    console.error("error occurred while create mastercategory: " + error);
     return error;
   }
 };

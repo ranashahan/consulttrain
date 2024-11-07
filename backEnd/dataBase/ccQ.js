@@ -9,13 +9,14 @@ const pool = require("./db.js");
 const ccFindBoth = async (clientid, contractorid) => {
   const query =
     "select * from client_contractor where client_id=? and contractor_id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [clientid, contractorid]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while client_contractor find");
+    client.release();
+    console.error("error occurred while cc find: " + error);
     return error;
   }
 };
@@ -27,13 +28,14 @@ const ccFindBoth = async (clientid, contractorid) => {
  */
 const ccFindByClientID = async (clientid) => {
   const query = "select * from client_contractor where client_id=?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [clientid]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while client_contractor find");
+    client.release();
+    console.error("error occurred while cc find by clientid: " + error);
     return error;
   }
 };
@@ -45,13 +47,14 @@ const ccFindByClientID = async (clientid) => {
  */
 const ccFindByContractorID = async (contractorid) => {
   const query = `select * from client_contractor where contractor_id=?`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [contractorid]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while client_contractor find");
+    client.release();
+    console.error("error occurred while cc find by contractorid: " + error);
     return error;
   }
 };
@@ -66,14 +69,14 @@ const ccDelete = async (clientids, contractorid) => {
   const relationships = clientids.map((clientid) => [clientid, contractorid]);
   const query =
     "DELETE FROM client_contractor WHERE (client_id, contractor_id) IN (?)";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [relationships]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while cc delete");
+    client.release();
+    console.error("error occurred while cc delete: " + error);
     return error;
   }
 };
@@ -85,14 +88,14 @@ const ccDelete = async (clientids, contractorid) => {
 const ccDeleteClients = async (clientids) => {
   const relationships = clientids.map((clientid) => [clientid]);
   const query = "DELETE FROM client_contractor WHERE (client_id) IN (?)";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [relationships]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while cc delete");
+    client.release();
+    console.error("error occurred while cc delete clients: " + error);
     return error;
   }
 };
@@ -103,14 +106,14 @@ const ccDeleteClients = async (clientids) => {
  */
 const ccDeleteByContractor = async (contractorid) => {
   const query = "DELETE FROM client_contractor WHERE contractor_id=?";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [contractorid]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while cc delete");
+    client.release();
+    console.error("error occurred while cc delete contractors: " + error);
     return error;
   }
 };
@@ -126,13 +129,14 @@ const ccCreate = async (clientids, contractorid) => {
 
   const query =
     "INSERT INTO client_contractor (client_id, contractor_id) VALUES ?";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [relationships]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while create cc");
+    client.release();
+    console.error("error occurred while create cc: " + error);
     return error;
   }
 };

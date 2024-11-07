@@ -8,14 +8,14 @@ const pool = require("./db.js");
 const sessionFind = async (name) => {
   const query =
     "select id, name, sessiondate,createdby from session where name=? and active=1 limit 1";
-  //   console.log(email);
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [name]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while session find");
+    client.release();
+    console.error("error occurred while session find: " + error);
     return error;
   }
 };
@@ -26,6 +26,7 @@ const sessionFind = async (name) => {
  * @returns {result} result
  */
 const sessionAllTimeFrame = async (req) => {
+  const client = await pool.getConnection();
   try {
     const {
       name,
@@ -76,12 +77,15 @@ const sessionAllTimeFrame = async (req) => {
         conditions.join(" AND ") +
         "and s.active=1 order by s.created_at desc limit 200";
     }
-    const client = await pool.pool.getConnection();
+
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while driver search");
+    client.release();
+    console.error(
+      "error occurred while session All Time Frame search: " + error
+    );
     return error;
   }
 };
@@ -96,19 +100,24 @@ const assessmentAll = async () => {
       sc.name AS categoryName, 
       a.id AS activityId, 
       a.name AS activityName,
+      a.orderid as activityOrder,
       sc.initials as categoryInitials,
       a.initials as activityInitials
     FROM slavecategory sc
     LEFT JOIN activity a ON sc.id = a.slavecategoryid
-    and a.active = 1
-    and sc.active=1;`;
+    where a.active = 1
+    and sc.active = 1 
+    ORDER BY 
+    sc.orderid ASC, 
+    a.orderid ASC;`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while all assessments");
+    client.release();
+    console.error("error occurred while all assessments: " + error);
     return error;
   }
 };
@@ -173,13 +182,14 @@ const insertAssessment = async (
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
   const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, params);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while insert assessments");
+    client.release();
+    console.error("error occurred while insert assessments: " + error);
     return error;
   }
 };
@@ -191,13 +201,14 @@ const insertAssessment = async (
  */
 const sessionFindByID = async (id) => {
   const query = "select * from vsession where id=? and active = 1";
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
   } catch (error) {
-    console.log("error occurred while session find by id");
+    client.release();
+    console.error("error occurred while session find by id: " + error);
     return error;
   }
 };
@@ -244,15 +255,14 @@ const sessionUpdateByID = async (
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
   const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, params);
     client.release();
     return result;
   } catch (error) {
-    console.log(error);
-    console.log("error occurred while session update by ID");
+    client.release();
+    console.error("error occurred while session update by ID: " + error);
     return error;
   }
 };
@@ -263,14 +273,14 @@ const sessionUpdateByID = async (
  */
 const sessionDeleteByID = async (id) => {
   const query = "CALL delete_session_data(?);";
-
+  const client = await pool.getConnection();
   try {
-    const client = await pool.pool.getConnection();
     const result = await client.query(query, [id]);
     client.release();
     return result;
   } catch (error) {
-    console.log("error occurred while delete session");
+    client.release();
+    console.error("error occurred while delete session: " + error);
     return error;
   }
 };

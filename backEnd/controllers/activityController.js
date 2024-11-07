@@ -9,7 +9,8 @@ const dbSlave = require("../dataBase/slavecategoryQ");
  */
 const createaActivity = asyncHandler(async (req, res) => {
   try {
-    const { name, description, initials, slavecategoryid, userid } = req.body;
+    const { name, description, initials, orderid, slavecategoryid, userid } =
+      req.body;
 
     if (!name || !slavecategoryid || !userid) {
       return res.status(422).json({
@@ -35,6 +36,7 @@ const createaActivity = asyncHandler(async (req, res) => {
       name,
       description,
       initials,
+      orderid,
       slavecategoryid,
       userid
     );
@@ -117,7 +119,8 @@ const getActivitiesBySlaveID = asyncHandler(async (req, res) => {
 const updateActivity = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, description, initials, slavecategoryid, userid } = req.body;
+    const { name, description, initials, orderid, slavecategoryid, userid } =
+      req.body;
     if (!id) {
       return res.status(422).json({
         message: "Please provide param (id)",
@@ -141,6 +144,7 @@ const updateActivity = asyncHandler(async (req, res) => {
       name,
       description,
       initials,
+      orderid,
       slavecategoryid,
       userid,
       id
