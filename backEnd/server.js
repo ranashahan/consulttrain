@@ -1,9 +1,46 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const helmet = require("helmet");
 const cors = require("cors");
 const errorHandler = require("./middleware/errorHandler");
+const fs = require("fs");
+const rfs = require("rotating-file-stream");
 const path = require("path");
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv");
+dotenv.config();
+
+// const accessLogStream = fs.createWriteStream(
+//   path.join(__dirname, "access.log"),
+//   { flags: "a" }
+// );
+
+// Function to generate the filename based on the date
+// const getLogFilename = (time, index) => {
+//   if (!time) return "access.log"; // Default file name
+//   const date = new Date(time);
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, "0");
+//   const day = String(date.getDate()).padStart(2, "0");
+//   return `access-${year}-${month}-${day}.log`; // Example: access-2024-11-14.log
+// };
+
+const getLogFilename = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `access-${year}-${month}-${day}.log`; // Example: access-2024-11-14.log
+};
+const customFormat =
+  ':remote-addr - :remote-user [:date[clf]] ":method :url" :status :res[content-length] ":referrer" ":user-agent"';
+
+var accessLogStream = rfs.createStream(getLogFilename, {
+  interval: "1d", // Rotate daily
+  path: path.join(__dirname, "log"),
+  initialRotation: true, // Force immediate rotation on startup
+});
+const morgan = require("morgan");
+
 const pool = require("./dataBase/db.js");
 const app = express();
 
@@ -21,6 +58,22 @@ app.use(cors(corsOptions));
 //app.options("*", cors());
 app.use(bodyParser.json());
 app.use(express.json());
+
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+  app.use(morgan("combined", { stream: accessLogStream }));
+} else if (process.env.NODE_ENV === "test") {
+  dotenv.config({ path: ".env.test" });
+  app.use(morgan("combined", { stream: accessLogStream }));
+} else {
+  app.use(morgan(customFormat, { stream: accessLogStream }));
+  // app.use(
+  //   morgan(":method :url :status :response-time ms - :res[content-length]")
+  // );
+}
+
+app.use(helmet());
+
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/bloodgroup", require("./routes/bgRoutes.js"));
 app.use("/api/trainer", require("./routes/trainerRoutes.js"));
@@ -42,7 +95,7 @@ app.use("/api/assessment", require("./routes/assessmentRoutes.js"));
 
 // Route all other requests to the Angular app's index.html
 // app.get("*", (req, res) => {
-// res.sendFile(path.join(__dirname, "consulttrain/browser/index.html"));
+//   res.sendFile(path.join(__dirname, "consulttrain/browser/index.html"));
 // });
 app.use(errorHandler);
 
@@ -50,7 +103,10 @@ pool
   .getConnection()
   .then(() => {
     app.listen(port, () => {
-      console.log(`Server is running against ${port}`);
+      console.log("connection successfully created");
+      console.log(
+        `Server is running in ${process.env.NODE_ENV} mode on port ${port}`
+      );
     });
   })
   .catch((err) => {

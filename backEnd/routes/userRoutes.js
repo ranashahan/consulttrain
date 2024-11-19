@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated, roleAuthorize } = require("../middleware/auth");
+const {
+  ensureAuthenticated,
+  roleAuthorize,
+  cacheMiddleware,
+} = require("../middleware/auth");
 const {
   updateUser,
   getUser,
@@ -13,31 +17,34 @@ const {
   logoutUser,
   updateUserPassword,
 } = require("../controllers/userController");
+const { constants } = require("../constants");
 
-router.get("/getusers", ensureAuthenticated, getUsers);
-// router.get("/getusers", getUsers);
+router.get(
+  "/getusers",
+  ensureAuthenticated,
+  cacheMiddleware,
+  roleAuthorize(constants.MANAGERS),
+  getUsers
+);
 router
   .route("/:id")
   .get(
     ensureAuthenticated,
-    roleAuthorize(["admin", "manager", "staff", "member", "guest"]),
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
     getUser
   )
-  .put(
-    ensureAuthenticated,
-    roleAuthorize(["admin", "manager", "staff", "member", "guest"]),
-    updateUser
-  )
-  .delete(ensureAuthenticated, roleAuthorize(["admin", "manager"]), deleteUser);
+  .put(ensureAuthenticated, roleAuthorize(constants.ALLROLES), updateUser)
+  .delete(ensureAuthenticated, roleAuthorize(constants.MANAGERS), deleteUser);
 router.get("/findbyemail/currentuser", currentUser);
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
-router.route("/logout").post(logoutUser);
+router.route("/logout").post(ensureAuthenticated, logoutUser);
 router
   .route("/newpassword")
   .post(
     ensureAuthenticated,
-    roleAuthorize(["admin", "manager"]),
+    roleAuthorize(constants.MANAGERS),
     updateUserPassword
   );
 router.route("/login/refreshtoken").post(refreshToken);

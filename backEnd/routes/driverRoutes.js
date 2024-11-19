@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const {
+  ensureAuthenticated,
+  cacheMiddleware,
+  roleAuthorize,
+} = require("../middleware/auth");
 const {
   deleteDriver,
   updateDriver,
@@ -13,17 +17,51 @@ const {
 const {
   getDashboardDriverCounts,
 } = require("../controllers/dashboardController");
+const { constants } = require("../constants");
 
-router.route("/create").post(ensureAuthenticated, createDriver);
-router.route("/getAll").get(ensureAuthenticated, getDrivers);
-router.route("/nic").get(ensureAuthenticated, getDriverByNIC);
-router.route("/search").get(ensureAuthenticated, getDriverSearch);
+router
+  .route("/create")
+  .post(ensureAuthenticated, roleAuthorize(constants.MANAGERS), createDriver);
+router
+  .route("/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getDrivers
+  );
+router
+  .route("/nic")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getDriverByNIC
+  );
+router
+  .route("/search")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getDriverSearch
+  );
 router
   .route("/dashboardcounts")
-  .get(ensureAuthenticated, getDashboardDriverCounts);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLSTAFF),
+    getDashboardDriverCounts
+  );
 router
   .route("/:id")
-  .get(ensureAuthenticated, getDriver)
-  .put(ensureAuthenticated, updateDriver)
-  .delete(ensureAuthenticated, deleteDriver);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getDriver
+  )
+  .put(ensureAuthenticated, roleAuthorize(constants.ALLSTAFF), updateDriver)
+  .delete(ensureAuthenticated, roleAuthorize(constants.ALLSTAFF), deleteDriver);
 module.exports = router;

@@ -1,9 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
-const config = require("../config");
 const db = require("../dataBase/userQ");
+const { constants } = require("../constants");
 
 /**
  * @description Register a user
@@ -25,19 +24,21 @@ const registerUser = asyncHandler(async (req, res) => {
     } = req.body.obj;
 
     if (!username || !name || !email || !password) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message:
-          "Please fill in all fields (username, name, email and password)",
+          "Please fill out all the fields (username, name, email and password)",
       });
     }
     const [users] = await db.userFind(email);
     if (users) {
-      return res.status(409).json({ message: "Email already exists" });
+      return res
+        .status(constants.CONFLICT)
+        .json({ message: "Email already exists" });
     }
     const [validateUsername] = await db.findbyUsername(username);
     if (validateUsername) {
       return res
-        .status(409)
+        .status(constants.CONFLICT)
         .json({ message: username + " Username already exists" });
     }
 
@@ -61,7 +62,7 @@ const registerUser = asyncHandler(async (req, res) => {
       }`,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 
@@ -75,30 +76,34 @@ const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(422)
-        .json({ message: "Please fill in all fields (email and password)" });
+      return res.status(constants.UNPROCESSABLE).json({
+        message: "Please fill out all the fields (email and password)",
+      });
     }
 
     const user = await db.userFind(email);
     if (!user) {
-      return res.status(401).json({ message: "Email or password is invalid" });
+      return res
+        .status(constants.UNAUTHORIZED)
+        .json({ message: "Email or password is invalid" });
     }
 
     const passwordMatch = await bcrypt.compare(password, user[0].password);
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Email or password is invalid" });
+      return res
+        .status(constants.UNAUTHORIZED)
+        .json({ message: "Email or password is invalid" });
     }
 
     const userid = user[0].userid;
-    const accessToken = jwt.sign({ userid }, config.accessTokenSecret, {
+    const accessToken = jwt.sign({ userid }, constants.ACCESSTOKENSECRET, {
       subject: "accessApi",
-      expiresIn: config.accessTokenExpiresIn,
+      expiresIn: constants.ACCESSTOKENEXPIRESIN,
     });
 
-    const refreshToken = jwt.sign({ userid }, config.refreshTokenSecret, {
+    const refreshToken = jwt.sign({ userid }, constants.REFRESHTOKENSECRET, {
       subject: "refreshToken",
-      expiresIn: config.refreshTokenExpiresIn,
+      expiresIn: constants.REFRESHTOKENEXPIRESIN,
     });
 
     await db.createRefreshToken(userid, refreshToken);
@@ -111,9 +116,8 @@ const loginUser = asyncHandler(async (req, res) => {
       accessToken,
       refreshToken,
     });
-    // }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 
@@ -126,14 +130,14 @@ const currentUser = asyncHandler(async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide email id ",
       });
     }
     const result = await db.userFind(email);
     return res.status(200).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -147,7 +151,7 @@ const getUsers = asyncHandler(async (req, res) => {
     const result = await db.allUsers();
     return res.status(200).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -160,19 +164,19 @@ const getUser = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const result = await db.userFindByID(id);
-    if (!result.length > 0) {
-      return res.status(422).json({
+    if (result.length === 0) {
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
     return res.status(200).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -187,20 +191,20 @@ const updateUser = asyncHandler(async (req, res) => {
     const { name, mobile, company, designation, imagepath, role, userid } =
       req.body;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const user = await db.userFindByID(id);
     if (user.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
     const currentUserid = user[0].userid;
     if (id == currentUserid) {
     } else {
-      res.status(403).json({
+      res.status(constants.FORBIDDIN).json({
         message: `Provided (id ${id}) and database id does not match`,
       });
     }
@@ -217,7 +221,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
     return res.status(201).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -230,14 +234,14 @@ const updateUserPassword = asyncHandler(async (req, res) => {
   try {
     const { id, password, userid } = req.body;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide id (id)",
       });
     }
 
     const user = await db.userFindByID(id);
     if (user.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
@@ -251,7 +255,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
     const currentUserid = user[0].userid;
     if (id == currentUserid) {
     } else {
-      res.status(403).json({
+      res.status(constants.FORBIDDIN).json({
         message: `Provided (id ${id}) and database id does not match`,
       });
     }
@@ -262,7 +266,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 
     return res.status(201).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -275,27 +279,27 @@ const deleteUser = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const user = await db.userFindByID(id);
     if (user.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
     const userid = user[0].userid;
     if (id == userid) {
     } else {
-      res.status(403).json({
+      res.status(constants.FORBIDDIN).json({
         message: `Provided (id ${id}) and database id does not match`,
       });
     }
     const result = await db.userDeleteByID(id);
     return res.status(201).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -309,35 +313,36 @@ const refreshToken = asyncHandler(async (req, res) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(401).json({ message: "Refresh token not found" });
+      return res
+        .status(constants.UNAUTHORIZED)
+        .json({ message: "Refresh token not found" });
     }
 
     const decodedRefreshToken = jwt.verify(
       refreshToken,
-      config.refreshTokenSecret
+      constants.REFRESHTOKENSECRET
     );
 
-    //console.log(decodedRefreshToken.userid);
     const userid = decodedRefreshToken.userid;
     const userRefreshToken = await db.findRefreshToken(userid, refreshToken);
 
     if (userRefreshToken.length < 0) {
       return res
-        .status(401)
+        .status(constants.UNAUTHORIZED)
         .json({ message: "Refresh token invalid or expired" });
     }
 
     await db.deleteRefreshToken(userid);
     // await userRefreshTokens.compactDatafile();
 
-    const accessToken = jwt.sign({ userid }, config.accessTokenSecret, {
+    const accessToken = jwt.sign({ userid }, constants.ACCESSTOKENSECRET, {
       subject: "accessApi",
-      expiresIn: config.accessTokenExpiresIn,
+      expiresIn: constants.ACCESSTOKENEXPIRESIN,
     });
 
-    const newRefreshToken = jwt.sign({ userid }, config.refreshTokenSecret, {
+    const newRefreshToken = jwt.sign({ userid }, constants.REFRESHTOKENSECRET, {
       subject: "refreshToken",
-      expiresIn: config.refreshTokenExpiresIn,
+      expiresIn: constants.REFRESHTOKENEXPIRESIN,
     });
     await db.createRefreshToken(userid, refreshToken);
 
@@ -351,11 +356,11 @@ const refreshToken = asyncHandler(async (req, res) => {
       error instanceof jwt.JsonWebTokenError
     ) {
       return res
-        .status(401)
+        .status(constants.UNAUTHORIZED)
         .json({ message: "Refresh token invalid or expired" });
     }
 
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 
@@ -368,13 +373,15 @@ const logoutUser = asyncHandler(async (req, res) => {
   try {
     const { userid } = req.body;
     if (userid.length < 1) {
-      return res.status(401).json({ message: "userid not found" });
+      return res
+        .status(constants.UNPROCESSABLE)
+        .json({ message: "userid not found" });
     }
     // console.log("i am in logout user and my id is " + userid);
     await db.deleteRefreshToken(userid);
     return res.status(204).send();
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 

@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const {
+  ensureAuthenticated,
+  cacheMiddleware,
+  roleAuthorize,
+} = require("../middleware/auth");
 const {
   deleteVehicle,
   updateVehicle,
@@ -8,12 +12,31 @@ const {
   getVehicles,
   createVehicle,
 } = require("../controllers/vehicleController");
+const { constants } = require("../constants");
 
-router.route("/create").post(ensureAuthenticated, createVehicle);
-router.route("/getAll").get(ensureAuthenticated, getVehicles);
+router
+  .route("/create")
+  .post(ensureAuthenticated, roleAuthorize(constants.MANAGERS), createVehicle);
+router
+  .route("/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getVehicles
+  );
 router
   .route("/:id")
-  .get(ensureAuthenticated, getVehicle)
-  .put(ensureAuthenticated, updateVehicle)
-  .delete(ensureAuthenticated, deleteVehicle);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getVehicle
+  )
+  .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updateVehicle)
+  .delete(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    deleteVehicle
+  );
 module.exports = router;

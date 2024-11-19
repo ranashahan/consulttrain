@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const {
+  ensureAuthenticated,
+  cacheMiddleware,
+  roleAuthorize,
+} = require("../middleware/auth");
 const {
   deletelocation,
   updatelocation,
@@ -9,15 +13,39 @@ const {
   createlocation,
 } = require("../controllers/locationController");
 const { getDashboardLocation } = require("../controllers/dashboardController");
+const { constants } = require("../constants");
 
-router.route("/create").post(ensureAuthenticated, createlocation);
-router.route("/getAll").get(ensureAuthenticated, getlocations);
+router
+  .route("/create")
+  .post(ensureAuthenticated, roleAuthorize(constants.MANAGERS), createlocation);
+router
+  .route("/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getlocations
+  );
 router
   .route("/getLocationCount")
-  .get(ensureAuthenticated, getDashboardLocation);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLSTAFF),
+    getDashboardLocation
+  );
 router
   .route("/:id")
-  .get(ensureAuthenticated, getlocation)
-  .put(ensureAuthenticated, updatelocation)
-  .delete(ensureAuthenticated, deletelocation);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getlocation
+  )
+  .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updatelocation)
+  .delete(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    deletelocation
+  );
 module.exports = router;

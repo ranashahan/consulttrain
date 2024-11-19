@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/driverQ");
+const { constants } = require("../constants");
 
 /**
  * @description Create a driver
@@ -32,7 +33,7 @@ const createDriver = asyncHandler(async (req, res) => {
     } = req.body;
 
     if (!name || !licensenumber || !nic || !userid) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message:
           "Please fill in all fields (driver name license number, NIC and userid)",
       });
@@ -40,13 +41,13 @@ const createDriver = asyncHandler(async (req, res) => {
     const [driverNIC] = await db.driverFindByNIC(nic);
     if (driverNIC) {
       return res
-        .status(409)
+        .status(constants.CONFLICT)
         .json({ message: "driver already existed with nic " + nic });
     }
     if (licensenumber) {
       const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
       if (driverLicenseNumber) {
-        return res.status(409).json({
+        return res.status(constants.CONFLICT).json({
           message:
             "driver already existed with license number " + licensenumber,
         });
@@ -83,7 +84,7 @@ const createDriver = asyncHandler(async (req, res) => {
       }`,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 
@@ -114,7 +115,7 @@ const getDrivers = asyncHandler(async (req, res) => {
 
     return res.status(200).json(formattedResponse);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -127,13 +128,13 @@ const getDriver = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const result = await db.driverFindByID(id);
     if (!result.length > 0) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
@@ -158,25 +159,25 @@ const getDriver = asyncHandler(async (req, res) => {
     });
     return res.status(200).json(formattedResponse);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 /**
  * @description get driver from ID
- * @route GET /api/driver/:id
+ * @route GET /api/driver/nic
  * @access private
  */
 const getDriverByNIC = asyncHandler(async (req, res) => {
   try {
     const nic = req.query.nic;
     if (!nic) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide NIC number in body",
       });
     }
     const result = await db.driverFindByNIC(nic);
     if (!result.length > 0) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong NIC ${nic} provided`,
       });
     }
@@ -203,13 +204,13 @@ const getDriverByNIC = asyncHandler(async (req, res) => {
 
     return res.status(200).json(formattedResponse);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
 /**
  * @description get driver from ID
- * @route GET /api/driver/:id
+ * @route GET /api/driver/search
  * @access private
  */
 const getDriverSearch = asyncHandler(async (req, res) => {
@@ -243,7 +244,7 @@ const getDriverSearch = asyncHandler(async (req, res) => {
 
     return res.status(200).json(formattedResponse);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -278,13 +279,13 @@ const updateDriver = asyncHandler(async (req, res) => {
       userid,
     } = req.body;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const driver = await db.driverFindByID(id);
     if (driver.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
@@ -314,7 +315,7 @@ const updateDriver = asyncHandler(async (req, res) => {
 
     return res.status(201).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 /**
@@ -326,20 +327,20 @@ const deleteDriver = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const driver = await db.driverFindByID(id);
     if (driver.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
 
     const session = await db.driverSessionFindByID(id);
     if (session.length > 0) {
-      return res.status(422).json({
+      return res.status(constants.CONFLICT).json({
         message: `Driver ${id} has active sessions and cannot be deleted.`,
       });
     }
@@ -347,7 +348,7 @@ const deleteDriver = asyncHandler(async (req, res) => {
     const result = await db.driverDeleteByID(id);
     return res.status(201).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
