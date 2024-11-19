@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const {
+  ensureAuthenticated,
+  cacheMiddleware,
+  roleAuthorize,
+} = require("../middleware/auth");
 const {
   createContractor,
   getContractors,
@@ -8,13 +12,36 @@ const {
   updateContractor,
   deleteContractor,
 } = require("../controllers/contractorController");
+const { constants } = require("../constants");
 
-router.route("/create").post(ensureAuthenticated, createContractor);
+router
+  .route("/create")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    createContractor
+  );
 // router.route("/getAll").get(getContractors);
-router.route("/getAll").get(ensureAuthenticated, getContractors);
+router
+  .route("/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getContractors
+  );
 router
   .route("/:id")
-  .get(ensureAuthenticated, getContractor)
-  .put(ensureAuthenticated, updateContractor)
-  .delete(ensureAuthenticated, deleteContractor);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getContractor
+  )
+  .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updateContractor)
+  .delete(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    deleteContractor
+  );
 module.exports = router;

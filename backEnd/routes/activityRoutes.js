@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const {
+  ensureAuthenticated,
+  roleAuthorize,
+  cacheMiddleware,
+} = require("../middleware/auth");
 const {
   deleteMasterCategory,
   updateMasterCategory,
@@ -23,37 +27,113 @@ const {
   createaActivity,
   getActivitiesBySlaveID,
 } = require("../controllers/activityController");
+const { constants } = require("../constants");
 
-router.route("/create").post(ensureAuthenticated, createaActivity);
-router.route("/getAll").get(ensureAuthenticated, getActivities);
+router
+  .route("/create")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    createaActivity
+  );
+router
+  .route("/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getActivities
+  );
 router
   .route("/getbyslave/:id")
-  .get(ensureAuthenticated, getActivitiesBySlaveID);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getActivitiesBySlaveID
+  );
 router
   .route("/:id")
-  .get(ensureAuthenticated, getActivity)
-  .put(ensureAuthenticated, updateActivity)
-  .post(ensureAuthenticated, deleteActivity);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getActivity
+  )
+  .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updateActivity)
+  .post(ensureAuthenticated, roleAuthorize(constants.MANAGERS), deleteActivity);
 
 /**
  * This is master categories routes
  */
-router.route("/master/create").post(ensureAuthenticated, createMasterCategory);
-router.route("/master/getAll").get(ensureAuthenticated, getMasterCategorys);
+router
+  .route("/master/create")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    createMasterCategory
+  );
+router
+  .route("/master/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getMasterCategorys
+  );
 router
   .route("/master/:id")
-  .get(ensureAuthenticated, getMasterCategory)
-  .put(ensureAuthenticated, updateMasterCategory)
-  .post(ensureAuthenticated, deleteMasterCategory);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getMasterCategory
+  )
+  .put(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    updateMasterCategory
+  )
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    deleteMasterCategory
+  );
 
 /**
  * This is slave categories routes
  */
-router.route("/slave/create").post(ensureAuthenticated, createSlaveCategory);
-router.route("/slave/getAll").get(ensureAuthenticated, getSlaveCategories);
+router
+  .route("/slave/create")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    createSlaveCategory
+  );
+router
+  .route("/slave/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getSlaveCategories
+  );
 router
   .route("/slave/:id")
-  .get(ensureAuthenticated, getSlaveCategory)
-  .put(ensureAuthenticated, updateSlaveCategory)
-  .post(ensureAuthenticated, deleteSlaveCategory);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getSlaveCategory
+  )
+  .put(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    updateSlaveCategory
+  )
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    deleteSlaveCategory
+  );
 module.exports = router;

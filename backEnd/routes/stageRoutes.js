@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const {
+  ensureAuthenticated,
+  cacheMiddleware,
+  roleAuthorize,
+} = require("../middleware/auth");
 const {
   deleteStage,
   updateStage,
@@ -8,12 +12,27 @@ const {
   getStages,
   createStage,
 } = require("../controllers/stageController");
+const { constants } = require("../constants");
 
-router.route("/create").post(ensureAuthenticated, createStage);
-router.route("/getAll").get(ensureAuthenticated, getStages);
+router
+  .route("/create")
+  .post(ensureAuthenticated, roleAuthorize(constants.MANAGERS), createStage);
+router
+  .route("/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getStages
+  );
 router
   .route("/:id")
-  .get(ensureAuthenticated, getStage)
-  .put(ensureAuthenticated, updateStage)
-  .delete(ensureAuthenticated, deleteStage);
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getStage
+  )
+  .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updateStage)
+  .delete(ensureAuthenticated, roleAuthorize(constants.MANAGERS), deleteStage);
 module.exports = router;
