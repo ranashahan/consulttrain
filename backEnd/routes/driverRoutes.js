@@ -21,7 +21,7 @@ const { constants } = require("../constants");
 
 router
   .route("/create")
-  .post(ensureAuthenticated, roleAuthorize(constants.MANAGERS), createDriver);
+  .post(ensureAuthenticated, roleAuthorize(constants.ALLSTAFF), createDriver);
 router
   .route("/getAll")
   .get(
