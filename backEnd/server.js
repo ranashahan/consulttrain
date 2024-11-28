@@ -72,7 +72,19 @@ if (process.env.NODE_ENV === "production") {
   // );
 }
 
-app.use(helmet());
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       directives: {
+//         defaultSrc: ["'self'"],
+//         scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts
+//         connectSrc: ["'self'", "http://192.168.0.143:5001/*"], // Allow API connection
+//         imgSrc: ["'self'", "data:"],
+//         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+//       },
+//     },
+//   })
+// );
 
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/bloodgroup", require("./routes/bgRoutes.js"));
@@ -91,12 +103,12 @@ app.use("/api/cc", require("./routes/ccRoutes.js"));
 app.use("/api/activity", require("./routes/activityRoutes.js"));
 app.use("/api/assessment", require("./routes/assessmentRoutes.js"));
 // Serve the Angular app's static files from the dist folder
-// app.use(express.static(path.join(__dirname, "consulttrain/browser")));
+app.use(express.static(path.join(__dirname, "consult-train/browser")));
 
 // Route all other requests to the Angular app's index.html
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "consulttrain/browser/index.html"));
-// });
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "consult-train/browser/index.html"));
+});
 app.use(errorHandler);
 
 pool

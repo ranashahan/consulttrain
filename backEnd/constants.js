@@ -5,6 +5,8 @@ exports.constants = {
   NOT_FOUND: 404,
   SERVER_ERROR: 500,
   UNPROCESSABLE: 422,
+  CREATED: 201,
+  SUCCESS: 200,
   CONFLICT: 409,
   // TTL: 1000 * 60 * 60,
   TTL: 1000 * 60 * 5,

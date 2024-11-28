@@ -45,6 +45,7 @@ const contractorFindByID = async (id) => {
  * @param {string} contact contractor contact info
  * @param {string} address contractor address
  * @param {string} initials contractor initials
+ * @param {string} clientid clientid
  * @param {string} userid user userid as modified by
  * @param {int} id contractor id
  * @returns {result} result
@@ -59,11 +60,12 @@ const contractorUpdateByID = async (
   contactdepartment,
   address,
   initials,
+  clientid,
   userid,
   id
 ) => {
   const query =
-    "UPDATE contractor SET name=?,description=?, ntnnumber=?,contactname=?,contactnumber=?,contactdesignation=?,contactdepartment=?,address=?,initials=?, modifiedby=? where id=?";
+    "UPDATE contractor SET name=?,description=?, ntnnumber=?,contactname=?,contactnumber=?,contactdesignation=?,contactdepartment=?,address=?,initials=?,clientid=?, modifiedby=? where id=?";
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -76,6 +78,7 @@ const contractorUpdateByID = async (
       contactdepartment,
       address,
       initials,
+      clientid,
       userid,
       id,
     ]);
@@ -135,6 +138,7 @@ const contractorAll = async () => {
  * @param {string} contactdepartment
  * @param {string} address
  * @param {string} initials
+ * @param {number} clientid
  * @param {number} userid
  * @returns {result} result
  */
@@ -148,10 +152,12 @@ const contractorCreate = async (
   contactdepartment,
   address,
   initials,
+  clientid,
   userid
 ) => {
-  const query = `INSERT INTO contractor (name, description, ntnnumber, contactname, contactnumber, contactdesignation, contactdepartment, address, initials,
-     createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?)`;
+  const query = `INSERT INTO contractor (name, description, ntnnumber, contactname, contactnumber, 
+  contactdesignation, contactdepartment, address, initials,clientid,
+     createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -164,6 +170,7 @@ const contractorCreate = async (
       contactdepartment,
       address,
       initials,
+      clientid,
       userid,
       userid,
     ]);

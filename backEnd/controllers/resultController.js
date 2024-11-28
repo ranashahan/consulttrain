@@ -12,14 +12,12 @@ const createResult = asyncHandler(async (req, res) => {
 
     if (!name || !userid) {
       return res.status(422).json({
-        message: "Please fill in all fields (location name and userid)",
+        message: "Please fill in all fields (result name and userid)",
       });
     }
     const [result] = await db.resultFind(name);
     if (result) {
-      return res
-        .status(409)
-        .json({ message: name + " Location already exists" });
+      return res.status(409).json({ message: name + " Result already exists" });
     }
 
     const newResult = await db.resultCreate(name, description, userid);
