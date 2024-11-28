@@ -53,7 +53,8 @@ const driverSearch = async (req) => {
       contractorid,
     } = req.query;
 
-    let query = "SELECT * FROM driver";
+    let query =
+      "SELECT id,name,nic,licensetypeid,licensenumber,licenseexpiry,permitnumber,permitissue,permitexpiry,contractorid FROM driver";
     const conditions = [];
     if (nic) {
       conditions.push(`nic LIKE '%${nic}%'`);
@@ -68,7 +69,7 @@ const driverSearch = async (req) => {
       conditions.push(`contractorid = '${contractorid}'`);
     }
     if (permitnumber) {
-      conditions.push(`permitnumber = '${permitnumber}'`);
+      conditions.push(`permitnumber LIKE '%${permitnumber}%'`);
     }
     if (permitexpiry) {
       conditions.push(`permitexpiry = '${permitexpiry}'`);
@@ -78,8 +79,9 @@ const driverSearch = async (req) => {
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        "and active=1 order by created_at desc limit 10";
+        " and active=1 order by created_at desc limit 200";
     }
+    // console.log(query);
     const result = await client.query(query);
     client.release();
     return result[0];
@@ -180,6 +182,7 @@ const driverUpdateByID = async (
   licensenumber,
   licensetypeid,
   licenseexpiry,
+  licenseverified,
   designation,
   department,
   permitnumber,
@@ -195,8 +198,8 @@ const driverUpdateByID = async (
   userid,
   id
 ) => {
-  const query = `UPDATE driver SET name=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?, 
-    designation=?, department=?, permitnumber=?, permitissue=?, permitexpiry=?, bloodgroupid=?, contractorid=?, 
+  const query = `UPDATE driver SET name=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?,
+  licenseverified=?,designation=?, department=?, permitnumber=?, permitissue=?, permitexpiry=?, bloodgroupid=?, contractorid=?, 
     visualid=?, ddccount=?, experience=?, code=?, comment=?, modifiedby=? where id=?`;
   const client = await pool.getConnection();
   try {
@@ -208,6 +211,7 @@ const driverUpdateByID = async (
       licensenumber,
       licensetypeid,
       licenseexpiry,
+      licenseverified,
       designation,
       department,
       permitnumber,
@@ -301,6 +305,7 @@ const driverCreate = async (
   licensenumber,
   licensetypeid,
   licenseexpiry,
+  licenseverified,
   designation,
   department,
   permitnumber,
@@ -315,9 +320,9 @@ const driverCreate = async (
   comment,
   userid
 ) => {
-  const query = `INSERT INTO driver (name,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,designation,
+  const query = `INSERT INTO driver (name,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
     department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
-    code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -328,6 +333,7 @@ const driverCreate = async (
       licensenumber,
       licensetypeid,
       licenseexpiry,
+      licenseverified,
       designation,
       department,
       permitnumber,

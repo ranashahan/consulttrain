@@ -40,10 +40,12 @@ const sessionAllTimeFrame = async (req) => {
       endDate,
     } = req.query;
 
-    let query = `SELECT s.id, s.name, s.sessiondate,d.id as driverid, d.name as drivername, d.nic, d.contractorid, s.locationid, s.resultid, s.stageid, s.totalscore  
+    let query = `SELECT s.id, s.name, s.sessiondate,d.id as driverid, d.name as drivername, d.nic, c.id as contractorid, s.locationid, s.resultid, s.stageid, s.totalscore  
     FROM session s 
     join session_driver sd on sd.session_id = s.id 
-    join driver d on sd.driver_id = d.id `;
+    join driver d on sd.driver_id = d.id 
+    join session_contractor sc on sc.session_id = s.id
+    join contractor c on sc.contractor_id = c.id`;
     const conditions = [];
     if (nic) {
       conditions.push(`d.nic LIKE '%${nic}%'`);
@@ -55,7 +57,7 @@ const sessionAllTimeFrame = async (req) => {
       conditions.push(`s.name LIKE '%${name}%'`);
     }
     if (contractorid) {
-      conditions.push(`d.contractorid = '${contractorid}'`);
+      conditions.push(`c.id = '${contractorid}'`);
     }
     if (resultid) {
       conditions.push(`s.resultid = '${resultid}'`);
@@ -157,9 +159,11 @@ const insertAssessment = async (
   weather,
   traffic,
   route,
+  quizscore,
   createdUserId,
   driverId,
-  trainerIds,
+  trainerid,
+  contractorid,
   assessmentData
 ) => {
   const params = [
@@ -176,12 +180,14 @@ const insertAssessment = async (
     weather,
     traffic,
     route,
+    quizscore,
     createdUserId,
     driverId,
-    trainerIds,
+    trainerid,
+    contractorid,
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
-  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, params);
@@ -234,6 +240,7 @@ const sessionUpdateByID = async (
   weather,
   traffic,
   route,
+  quizscore,
   userid,
   assessmentData
 ) => {
@@ -251,10 +258,11 @@ const sessionUpdateByID = async (
     weather,
     traffic,
     route,
+    quizscore,
     userid,
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
-  const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, params);

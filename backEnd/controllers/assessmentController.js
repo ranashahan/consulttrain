@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/assessmentQ");
+const { constants } = require("../constants");
 
 /**
  * @description Create a assessment
@@ -22,27 +23,29 @@ const createAssessment = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
-      trainerIds,
+      quizscore,
+      trainerid,
       assessmentData,
     } = req.body.obj;
-    const { driverId, userid } = req.body;
+    const { driverId, contractorid, userid } = req.body;
     if (
       !sessionName ||
       !sessionDate ||
       !userid ||
       !driverId ||
-      !trainerIds ||
+      !trainerid ||
+      !contractorid ||
       !assessmentData
     ) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message:
-          "Please fill in all fields (sessionName, sessionDate, driverId, trainerIds, userid and assessmentData)",
+          "Please fill in all fields (sessionName, sessionDate, driverId, trainerId, contractorid, userid and assessmentData)",
       });
     }
     const [assessment] = await db.sessionFind(sessionName);
     if (assessment) {
       return res
-        .status(409)
+        .status(constants.CONFLICT)
         .json({ message: sessionName + " Session already exists" });
     }
 
@@ -60,22 +63,26 @@ const createAssessment = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
+      quizscore,
       userid,
       driverId,
-      trainerIds,
+      trainerid,
+      contractorid,
       assessmentData
     );
 
     const newAssessmentmessage = JSON.stringify(newAssessment[0]);
     if (newAssessment.affectedRows == 1) {
-      return res.status(201).json({
+      return res.status(constants.CREATED).json({
         message: `assessment created successfully`,
       });
     } else {
-      return res.status(422).json({ message: newAssessmentmessage });
+      return res
+        .status(constants.UNPROCESSABLE)
+        .json({ message: newAssessmentmessage });
     }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 
@@ -118,9 +125,9 @@ const getAssessments = asyncHandler(async (req, res) => {
 
     // res.json(categories);
 
-    return res.status(200).json(categories);
+    return res.status(constants.SUCCESS).json(categories);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -133,9 +140,9 @@ const getSessionByDate = asyncHandler(async (req, res) => {
   try {
     const results = await db.sessionAllTimeFrame(req);
 
-    return res.status(200).json(results);
+    return res.status(constants.SUCCESS).json(results);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 /**
@@ -147,13 +154,13 @@ const getSession = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const result = await db.sessionFindByID(id);
     if (!result.length > 0) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
@@ -172,10 +179,10 @@ const getSession = asyncHandler(async (req, res) => {
       return item;
     });
 
-    return res.status(200).json(formattedResponse);
+    return res.status(constants.SUCCESS).json(formattedResponse);
     //return res.status(200).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -199,19 +206,20 @@ const updateSession = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
+      quizscore,
       assessmentData,
     } = req.body.obj;
     const id = req.params.id;
     const { userid } = req.body;
 
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
 
     if (!sessionDate || !userid || !assessmentData) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message:
           "Please fill in all fields (sessionDate, userid and assessmentData)",
       });
@@ -219,7 +227,7 @@ const updateSession = asyncHandler(async (req, res) => {
 
     const session = await db.sessionFindByID(id);
     if (session.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
@@ -239,13 +247,14 @@ const updateSession = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
+      quizscore,
       userid,
       assessmentData
     );
 
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 /**
@@ -257,20 +266,20 @@ const deleteSession = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const session = await db.sessionFindByID(id);
     if (session.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
     const result = await db.sessionDeleteByID(id);
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
