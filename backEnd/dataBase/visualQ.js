@@ -84,12 +84,12 @@ const visualDeleteByID = async (id) => {
  * @returns {visual} visual
  */
 const visualAll = async () => {
-  const query = "SELECT * FROM visual;";
+  const query = "CALL `consulttrain`.`getAllVisuals`();";
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
     client.release();
-    return result[0];
+    return result[0][0];
   } catch (error) {
     client.release();
     console.error("error occurred while all visual: " + error);

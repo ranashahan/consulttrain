@@ -83,12 +83,12 @@ const resultDeleteByID = async (id) => {
  * @returns {result} result
  */
 const resultAll = async () => {
-  const query = "SELECT * FROM result;";
+  const query = "CALL `consulttrain`.`getAllResults`();";
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
     client.release();
-    return result[0];
+    return result[0][0];
   } catch (error) {
     client.release();
     console.error("error occurred while all results: " + error);

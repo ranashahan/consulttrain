@@ -24,6 +24,7 @@ const createAssessment = asyncHandler(async (req, res) => {
       traffic,
       route,
       quizscore,
+      comment,
       trainerid,
       assessmentData,
     } = req.body.obj;
@@ -64,6 +65,7 @@ const createAssessment = asyncHandler(async (req, res) => {
       traffic,
       route,
       quizscore,
+      comment,
       userid,
       driverId,
       trainerid,
@@ -207,6 +209,7 @@ const updateSession = asyncHandler(async (req, res) => {
       traffic,
       route,
       quizscore,
+      comment,
       assessmentData,
     } = req.body.obj;
     const id = req.params.id;
@@ -248,6 +251,7 @@ const updateSession = asyncHandler(async (req, res) => {
       traffic,
       route,
       quizscore,
+      comment,
       userid,
       assessmentData
     );

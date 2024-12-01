@@ -99,7 +99,6 @@ app.use("/api/vehicle", require("./routes/vehicleRoutes.js"));
 app.use("/api/visual", require("./routes/visualRoutes.js"));
 app.use("/api/driver", require("./routes/driverRoutes.js"));
 app.use("/api/client", require("./routes/clientRoutes.js"));
-app.use("/api/cc", require("./routes/ccRoutes.js"));
 app.use("/api/activity", require("./routes/activityRoutes.js"));
 app.use("/api/assessment", require("./routes/assessmentRoutes.js"));
 // Serve the Angular app's static files from the dist folder
