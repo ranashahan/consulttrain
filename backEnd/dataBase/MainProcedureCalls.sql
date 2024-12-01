@@ -1,23 +1,26 @@
 CALL insert_session_data(
-    'Session 9',  	-- session name
-    '2024-10-04',  	-- session date
+    'Session 10',  	-- session name
+    '2024-11-27',  	-- session date
     6001, 			-- location id
     7001,			-- result id
     8004,			-- stage id 
     9001, 			-- title id
     10001,			-- vehicle id
     103,			-- total score
-    '2024-10-04',  	-- class date
-    '2024-10-04', 	-- yard date
+    '2024-11-26',  	-- class date
+    '2024-11-26', 	-- yard date
     'sunny',		-- weather
     'highway',		-- traffic
     'Malir road',	-- route
+    '20/30',		-- quizscore
+    'comment',		-- comment
     1001,			-- created user id
     20021,          -- Driver ID
-    '2001',          -- Trainer IDs
-    '[{"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Initial", "score": 1, "assessmentdate": "2024-10-04"},
-      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Middle", "score": 2, "assessmentdate": "2024-10-04"},
-      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Final", "score": 3, "assessmentdate": "2024-10-04"}]'  -- Assessment data as JSON
+    2001,          	-- Trainer ID
+    5010,			-- contractor ID
+    '[{"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Initial", "score": 1, "assessmentdate": "2024-11-27"},
+      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Middle", "score": 2, "assessmentdate": "2024-11-27"},
+      {"slavecategoryid": 5,"activityid": 1, "assessmenttype": "Final", "score": 3, "assessmentdate": "2024-11-27"}]'  -- Assessment data as JSON
 );
 
 CALL `consulttrain`.`update_session_data`(20, '2024-10-18', null, null, null,null, null, 8, null, null, null,null, null, 1001, 

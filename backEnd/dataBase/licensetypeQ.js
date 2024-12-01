@@ -84,12 +84,12 @@ const dlTypeDeleteByID = async (id) => {
  * @returns {result} result
  */
 const dlTypeAll = async () => {
-  const query = "SELECT * FROM licensetype;";
+  const query = "CALL `consulttrain`.`getAllLicenseTypes`();";
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
     client.release();
-    return result[0];
+    return result[0][0];
   } catch (error) {
     client.release();
     console.error("error occurred while all dltypes: " + error);

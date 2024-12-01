@@ -153,6 +153,7 @@ const driverSessionFindByID = async (id) => {
 /**
  * This method will update driver via userid
  * @param {string} name driver name
+ * @param {string} gender driver gender
  * @param {Date} dob driver date of birth
  * @param {string} nic driver NIC number
  * @param {Date} nicexpiry driver NIC expiry date
@@ -176,6 +177,7 @@ const driverSessionFindByID = async (id) => {
  */
 const driverUpdateByID = async (
   name,
+  gender,
   dob,
   nic,
   nicexpiry,
@@ -198,13 +200,14 @@ const driverUpdateByID = async (
   userid,
   id
 ) => {
-  const query = `UPDATE driver SET name=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?,
+  const query = `UPDATE driver SET name=?, gender=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?,
   licenseverified=?,designation=?, department=?, permitnumber=?, permitissue=?, permitexpiry=?, bloodgroupid=?, contractorid=?, 
     visualid=?, ddccount=?, experience=?, code=?, comment=?, modifiedby=? where id=?`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
       name,
+      gender,
       dob,
       nic,
       nicexpiry,
@@ -276,6 +279,7 @@ const driversAll = async () => {
 /**
  * This method for create driver.
  * @param {string} name driver name
+ * @param {string} gender driver gender
  * @param {Date} dob driver date of birth
  * @param {string} nic driver NIC number
  * @param {string} nicexpiry driver NIC expiry
@@ -299,6 +303,7 @@ const driversAll = async () => {
  */
 const driverCreate = async (
   name,
+  gender,
   dob,
   nic,
   nicexpiry,
@@ -320,13 +325,14 @@ const driverCreate = async (
   comment,
   userid
 ) => {
-  const query = `INSERT INTO driver (name,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
+  const query = `INSERT INTO driver (name,gender,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
     department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
-    code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
       name,
+      gender,
       dob,
       nic,
       nicexpiry,

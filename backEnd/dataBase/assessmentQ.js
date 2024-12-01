@@ -160,6 +160,7 @@ const insertAssessment = async (
   traffic,
   route,
   quizscore,
+  comment,
   createdUserId,
   driverId,
   trainerid,
@@ -181,13 +182,14 @@ const insertAssessment = async (
     traffic,
     route,
     quizscore,
+    comment,
     createdUserId,
     driverId,
     trainerid,
     contractorid,
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
-  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, params);
@@ -241,6 +243,7 @@ const sessionUpdateByID = async (
   traffic,
   route,
   quizscore,
+  comment,
   userid,
   assessmentData
 ) => {
@@ -259,10 +262,11 @@ const sessionUpdateByID = async (
     traffic,
     route,
     quizscore,
+    comment,
     userid,
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
-  const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, params);

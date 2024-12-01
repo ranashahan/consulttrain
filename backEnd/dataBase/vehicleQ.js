@@ -84,12 +84,12 @@ const vehicleDeleteByID = async (id) => {
  * @returns {vehicle} vehicle
  */
 const vehicleAll = async () => {
-  const query = "SELECT * FROM vehicle;";
+  const query = "CALL `consulttrain`.`getAllVehicles`();";
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
     client.release();
-    return result[0];
+    return result[0][0];
   } catch (error) {
     client.release();
     console.error("error occurred while all vehicle: " + error);

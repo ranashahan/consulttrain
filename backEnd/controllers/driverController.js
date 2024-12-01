@@ -11,6 +11,7 @@ const createDriver = asyncHandler(async (req, res) => {
   try {
     const {
       name,
+      gender,
       dob,
       nic,
       nicexpiry,
@@ -57,6 +58,7 @@ const createDriver = asyncHandler(async (req, res) => {
 
     const newDriver = await db.driverCreate(
       name,
+      gender,
       dob,
       nic,
       nicexpiry,
@@ -260,6 +262,7 @@ const updateDriver = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const {
       name,
+      gender,
       dob,
       nic,
       nicexpiry,
@@ -294,6 +297,7 @@ const updateDriver = asyncHandler(async (req, res) => {
     }
     const result = await db.driverUpdateByID(
       name,
+      gender,
       dob,
       nic,
       nicexpiry,
