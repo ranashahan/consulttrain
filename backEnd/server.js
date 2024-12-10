@@ -95,6 +95,7 @@ app.use("/api/location", require("./routes/locationRoutes.js"));
 app.use("/api/result", require("./routes/resultRoutes.js"));
 app.use("/api/stage", require("./routes/stageRoutes.js"));
 app.use("/api/title", require("./routes/titleRoutes.js"));
+app.use("/api/training", require("./routes/trainingRoutes.js"));
 app.use("/api/vehicle", require("./routes/vehicleRoutes.js"));
 app.use("/api/visual", require("./routes/visualRoutes.js"));
 app.use("/api/driver", require("./routes/driverRoutes.js"));

@@ -89,6 +89,95 @@ const createAssessment = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @description Create a training sessions
+ * @route POST /api/assessment/createst
+ * @access private
+ */
+const createSessionTraining = asyncHandler(async (req, res) => {
+  try {
+    const { trainingId, sessionIds } = req.body.payload;
+
+    if (!trainingId || !Array.isArray(sessionIds) || sessionIds.length === 0) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: "Please fill in all fields (trainingid,  and sessionid)",
+      });
+    }
+
+    const existingSessions = await db.sessionTrainingFind(
+      trainingId,
+      sessionIds
+    );
+
+    if (existingSessions.length > 0) {
+      const conflictIds = existingSessions.map((row) => row.session_id);
+      return res.status(constants.CONFLICT).json({
+        message: `The following session IDs are already assigned: ${conflictIds.join(
+          ", "
+        )}`,
+      });
+    }
+
+    const newTrainingSessions = await db.insertSessionWithTraining(
+      trainingId,
+      sessionIds
+    );
+
+    return res.status(constants.CREATED).json({
+      message:
+        `Sessions successfully added with training ` +
+        newTrainingSessions[0].affectedRows,
+    });
+  } catch (error) {
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
+  }
+});
+
+/**
+ * @description get all the training sessions
+ * @route GET /api/assessment/getst
+ * @access private
+ */
+const getSessionTraining = asyncHandler(async (req, res) => {
+  try {
+    const results = await db.sessionFindByTrainingID(req.query.trainingid);
+
+    return res.status(constants.SUCCESS).json(results);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
+ * @description delete trainingsession
+ * @route POST /api/assessment/deletest
+ * @access private
+ */
+const deleteSessionTraining = asyncHandler(async (req, res) => {
+  try {
+    const { trainingid, sessionid } = req.body;
+    console.log(req.body);
+
+    if (!trainingid || !sessionid) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: "Please provide trainingid & sessionid",
+      });
+    }
+    const trainingSession = await db.trainingSessionFind(trainingid, sessionid);
+    if (trainingSession.length < 1) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: `wrong param (trainingid ${trainingid}, sessionid ${sessionid}) provided`,
+      });
+    }
+
+    const result = await db.sessionTrainingDelete(trainingid, sessionid);
+
+    return res.status(constants.CREATED).json(result);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
  * @description get all the assessments
  * @route GET /api/assessment/getAll
  * @access private
@@ -294,4 +383,7 @@ module.exports = {
   getSession,
   updateSession,
   deleteSession,
+  createSessionTraining,
+  getSessionTraining,
+  deleteSessionTraining,
 };

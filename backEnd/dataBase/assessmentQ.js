@@ -19,6 +19,27 @@ const sessionFind = async (name) => {
     return error;
   }
 };
+/**
+ * This method for fetch training_session info
+ * @param {number*} trainingId
+ * @param {Array} sessionIds
+ * @returns {result} result
+ */
+const sessionTrainingFind = async (trainingId, sessionIds) => {
+  const query =
+    "SELECT session_id FROM training_session WHERE training_id = ? AND session_id IN (?);";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [trainingId, sessionIds]);
+    console.log(result[0]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while session find: " + error);
+    return error;
+  }
+};
 
 /**
  * This method for search query
@@ -222,6 +243,67 @@ const sessionFindByID = async (id) => {
 };
 
 /**
+ * This method use to fetch session by ID
+ * @param {string} id session param id
+ * @returns {result} result
+ */
+const sessionFindByTrainingID = async (trainingid) => {
+  const query = `select driverid, drivername, nic, licensenumber,licensetypeid,licenseexpiry,licenseverified,drivercontractorid, 
+    permitnumber,permitexpiry,drivercode,trainername,id,name,sessiondate,titleid,vehicleid,resultid 
+    from vsession where id in (select session_id from training_session where training_id = ?) and active = 1`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [trainingid]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while session find by id: " + error);
+    return error;
+  }
+};
+
+/**
+ * This method will fetch relationship table
+ * @param {number} trainingid
+ * @param {number} sessionid
+ * @returns {result} result
+ */
+const trainingSessionFind = async (trainingid, sessionid) => {
+  const query = `select * from training_session where training_id = ? and session_id = ?;`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [trainingid, sessionid]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while session find by id: " + error);
+    return error;
+  }
+};
+
+/**
+ * This method will delete training session
+ * @param {number} trainingid
+ * @param {number} sessionid
+ * @returns {result} result
+ */
+const sessionTrainingDelete = async (trainingid, sessionid) => {
+  const query = `DELETE FROM training_session WHERE training_id = ? and session_id = ?;`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [trainingid, sessionid]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while session find by id: " + error);
+    return error;
+  }
+};
+
+/**
  * This method will update session via userid
  * @param {string} name session name
  * @param {string} userid user userid as modified by
@@ -297,6 +379,29 @@ const sessionDeleteByID = async (id) => {
   }
 };
 
+/**
+ * This metod will insert training_session records
+ * @param {number} trainingId training id
+ * @param {Array} sessionIds array of session ids
+ * @returns
+ */
+const insertSessionWithTraining = async (trainingId, sessionIds) => {
+  const values = sessionIds.map((sessionId) => [trainingId, sessionId]);
+  console.log(values);
+  const query =
+    "INSERT INTO training_session (training_id, session_id) VALUES ?;";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [values]);
+    client.release();
+    return result;
+  } catch (error) {
+    client.release();
+    console.error("error occurred while delete session: " + error);
+    return error;
+  }
+};
+
 module.exports = {
   assessmentAll,
   insertAssessment,
@@ -305,4 +410,9 @@ module.exports = {
   sessionDeleteByID,
   sessionUpdateByID,
   sessionFindByID,
+  sessionTrainingFind,
+  insertSessionWithTraining,
+  sessionFindByTrainingID,
+  sessionTrainingDelete,
+  trainingSessionFind,
 };
