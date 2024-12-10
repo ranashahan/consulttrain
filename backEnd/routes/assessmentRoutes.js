@@ -8,10 +8,13 @@ const {
 const {
   getAssessments,
   createAssessment,
+  createSessionTraining,
   getSessionByDate,
   getSession,
   updateSession,
   deleteSession,
+  getSessionTraining,
+  deleteSessionTraining,
 } = require("../controllers/assessmentController");
 const { constants } = require("../constants");
 
@@ -22,7 +25,16 @@ router
     roleAuthorize(constants.ALLSTAFF),
     createAssessment
   );
+router
+  .route("/createst")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    createSessionTraining
+  );
 router.route("/getbydate").get(ensureAuthenticated, getSessionByDate);
+router.route("/getst").get(ensureAuthenticated, getSessionTraining);
+router.route("/deletets").post(ensureAuthenticated, deleteSessionTraining);
 router
   .route("/getAll")
   .get(
