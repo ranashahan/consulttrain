@@ -168,7 +168,7 @@ const getTraining = asyncHandler(async (req, res) => {
         message: "Please provide param (id)",
       });
     }
-    const result = await db.trainingFindByID(id);
+    const result = await db.trainingID(id);
     if (!result.length > 0) {
       return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
