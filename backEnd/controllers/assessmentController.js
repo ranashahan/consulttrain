@@ -155,7 +155,6 @@ const getSessionTraining = asyncHandler(async (req, res) => {
 const deleteSessionTraining = asyncHandler(async (req, res) => {
   try {
     const { trainingid, sessionid } = req.body;
-    console.log(req.body);
 
     if (!trainingid || !sessionid) {
       return res.status(constants.UNPROCESSABLE).json({
@@ -185,8 +184,6 @@ const deleteSessionTraining = asyncHandler(async (req, res) => {
 const getAssessments = asyncHandler(async (req, res) => {
   try {
     const results = await db.assessmentAll();
-    //console.log(results);
-
     const categories = [];
 
     results.forEach((row) => {
@@ -230,7 +227,11 @@ const getAssessments = asyncHandler(async (req, res) => {
 const getSessionByDate = asyncHandler(async (req, res) => {
   try {
     const results = await db.sessionAllTimeFrame(req);
-
+    if (!results.length > 0) {
+      return res.status(204).json({
+        message: `Could not found any result`,
+      });
+    }
     return res.status(constants.SUCCESS).json(results);
   } catch (error) {
     res.status(constants.SERVER_ERROR);

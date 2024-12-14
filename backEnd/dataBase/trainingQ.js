@@ -25,12 +25,30 @@ const trainingFind = async (name) => {
  * @returns {result} result
  */
 const trainingFindByID = async (id) => {
-  const query = "select * from training where id=? and active=1";
+  const query = "select id from training where id=? and active=1";
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [id]);
     client.release();
     return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while training find by id: " + error);
+    return error;
+  }
+};
+/**
+ * This method use to fetch training by ID
+ * @param {string} id training param id
+ * @returns {result} result
+ */
+const trainingID = async (id) => {
+  const query = "CALL `consulttrain`.`getTrainingByID`(?);";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [id]);
+    client.release();
+    return result[0][0];
   } catch (error) {
     client.release();
     console.error("error occurred while training find by id: " + error);
@@ -387,6 +405,7 @@ module.exports = {
   trainingDeleteByID,
   trainingUpdateByID,
   trainingFindByID,
+  trainingID,
   trainingFind,
   trainingAllTimeFrame,
 };
