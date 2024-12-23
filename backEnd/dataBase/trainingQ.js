@@ -67,15 +67,15 @@ const trainingAllTimeFrame = async (req) => {
     const {
       name,
       plandate,
-      cource,
-      category,
+      courseid,
+      categoryid,
       clientid,
       contractorid,
       startDate,
       endDate,
     } = req.query;
 
-    let query = `select id, name, cource, category, plandate, clientid, contractorid, trainerid, 
+    let query = `select id, name, courseid, categoryid, plandate, clientid, contractorid, trainerid, 
     total, amountreceived from training`;
     const conditions = [];
     if (name) {
@@ -84,11 +84,11 @@ const trainingAllTimeFrame = async (req) => {
     if (plandate) {
       conditions.push(`plandate = '${plandate}'`);
     }
-    if (cource) {
-      conditions.push(`cource = '${cource}'`);
+    if (courseid) {
+      conditions.push(`courseid = '${courseid}'`);
     }
-    if (category) {
-      conditions.push(`category = '${category}'`);
+    if (categoryid) {
+      conditions.push(`category = '${categoryid}'`);
     }
     if (clientid) {
       conditions.push(`clientid = '${clientid}'`);
@@ -159,8 +159,8 @@ const trainingAllTimeFrame = async (req) => {
  */
 const trainingUpdateByID = async (
   name,
-  cource,
-  category,
+  courseid,
+  categoryid,
   plandate,
   startdate,
   enddate,
@@ -192,7 +192,7 @@ const trainingUpdateByID = async (
   userid,
   id
 ) => {
-  const query = `UPDATE training SET name=?, cource=?, category=?, plandate=?,  startdate=?, enddate=?, duration=?, titleid=?,
+  const query = `UPDATE training SET name=?, courseid=?, categoryid=?, plandate=?,  startdate=?, enddate=?, duration=?, titleid=?,
       clientid=?, contractorid=?, trainerid=?, trainingexpiry=?, invoicenumber=?, invoicedate=?, charges=?,
       transportation=?, miscexpense=?, tax=?, total=?, bank=?, cheque=?, amountreceived=?, requestedby=?,
       contactnumber=?, source=?, venue=?, locationid=?, status=?, classroom=?, assessment=?, commentry=?,
@@ -201,8 +201,8 @@ const trainingUpdateByID = async (
   try {
     const result = await client.query(query, [
       name,
-      cource,
-      category,
+      courseid,
+      categoryid,
       plandate,
       startdate,
       enddate,
@@ -317,8 +317,8 @@ const trainingAll = async () => {
  */
 const trainingCreate = async (
   name,
-  cource,
-  category,
+  courseid,
+  categoryid,
   plandate,
   startdate,
   enddate,
@@ -349,7 +349,7 @@ const trainingCreate = async (
   commentry,
   userid
 ) => {
-  const query = `INSERT INTO training (name,cource,category,plandate,startdate,enddate,duration,titleid,clientid,contractorid,trainerid,trainingexpiry,
+  const query = `INSERT INTO training (name,courseid,categoryid,plandate,startdate,enddate,duration,titleid,clientid,contractorid,trainerid,trainingexpiry,
 invoicenumber,invoicedate,charges,transportation,miscexpense,tax,total,bank,cheque,amountreceived,
 requestedby,contactnumber,source,venue,locationid,status,classroom,assessment,commentry,createdby,modifiedby)
  VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
@@ -357,8 +357,8 @@ requestedby,contactnumber,source,venue,locationid,status,classroom,assessment,co
   try {
     const result = await client.query(query, [
       name,
-      cource,
-      category,
+      courseid,
+      categoryid,
       plandate,
       startdate,
       enddate,
