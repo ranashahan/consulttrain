@@ -21,9 +21,7 @@ const createDriver = asyncHandler(async (req, res) => {
       licenseverified,
       designation,
       department,
-      permitnumber,
-      permitissue,
-      permitexpiry,
+      medicalexpiry,
       bloodgroupid,
       contractorid,
       visualid,
@@ -68,9 +66,7 @@ const createDriver = asyncHandler(async (req, res) => {
       licenseverified,
       designation,
       department,
-      permitnumber,
-      permitissue,
-      permitexpiry,
+      medicalexpiry,
       bloodgroupid,
       contractorid,
       visualid,
@@ -81,6 +77,7 @@ const createDriver = asyncHandler(async (req, res) => {
       userid
     );
     const driverID = JSON.stringify(newDriver[0]);
+    console.log(driverID);
 
     return res.status(201).json({
       message: `Driver created successfully with driverID: ${
@@ -88,6 +85,8 @@ const createDriver = asyncHandler(async (req, res) => {
       }`,
     });
   } catch (error) {
+    console.log(error.message);
+
     return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
@@ -113,6 +112,12 @@ const getDrivers = asyncHandler(async (req, res) => {
       }
       if (item.permitexpiry) {
         item.permitexpiry = new Date(item.permitexpiry).toLocaleDateString();
+      }
+      if (item.medicalexpiry) {
+        item.medicalexpiry = new Date(item.medicalexpiry).toLocaleDateString();
+      }
+      if (item.nicexpiry) {
+        item.nicexpiry = new Date(item.nicexpiry).toLocaleDateString();
       }
       return item;
     });
@@ -159,6 +164,9 @@ const getDriver = asyncHandler(async (req, res) => {
       if (item.permitexpiry) {
         item.permitexpiry = new Date(item.permitexpiry).toLocaleDateString();
       }
+      if (item.medicalexpiry) {
+        item.medicalexpiry = new Date(item.medicalexpiry).toLocaleDateString();
+      }
       return item;
     });
     return res.status(200).json(formattedResponse);
@@ -203,6 +211,9 @@ const getDriverByNIC = asyncHandler(async (req, res) => {
       if (item.permitexpiry) {
         item.permitexpiry = new Date(item.permitexpiry).toLocaleDateString();
       }
+      if (item.medicalexpiry) {
+        item.medicalexpiry = new Date(item.medicalexpiry).toLocaleDateString();
+      }
       return item;
     });
 
@@ -243,6 +254,10 @@ const getDriverSearch = asyncHandler(async (req, res) => {
       if (item.permitexpiry) {
         item.permitexpiry = new Date(item.permitexpiry).toLocaleDateString();
       }
+      if (item.medicalexpiry) {
+        item.medicalexpiry = new Date(item.medicalexpiry).toLocaleDateString();
+      }
+
       return item;
     });
 
@@ -272,9 +287,9 @@ const updateDriver = asyncHandler(async (req, res) => {
       licenseverified,
       designation,
       department,
-      permitnumber,
       permitissue,
       permitexpiry,
+      medicalexpiry,
       bloodgroupid,
       contractorid,
       visualid,
@@ -307,9 +322,9 @@ const updateDriver = asyncHandler(async (req, res) => {
       licenseverified,
       designation,
       department,
-      permitnumber,
       permitissue,
       permitexpiry,
+      medicalexpiry,
       bloodgroupid,
       contractorid,
       visualid,
@@ -360,7 +375,69 @@ const deleteDriver = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @description get driver from ID
+ * @route GET /api/driver/expiry
+ * @access private
+ */
+const getDriverExpiry = asyncHandler(async (req, res) => {
+  try {
+    const param = req.query.param;
+    if (!param) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: "Please provide param  in request parameter",
+      });
+    }
+    const result = await db.driversExpiryReport(param);
+    if (!result.length > 0) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: `wrong param ${param} provided`,
+      });
+    }
+
+    let dataFromDatabase = result;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.Driver_DateOfBirth) {
+        item.Driver_DateOfBirth = new Date(
+          item.Driver_DateOfBirth
+        ).toLocaleDateString();
+      }
+      if (item.Driver_NationIdentityCard_Expiry) {
+        item.Driver_NationIdentityCard_Expiry = new Date(
+          item.Driver_NationIdentityCard_Expiry
+        ).toLocaleDateString();
+      }
+      if (item.Driver_License_Expiry) {
+        item.Driver_License_Expiry = new Date(
+          item.Driver_License_Expiry
+        ).toLocaleDateString();
+      }
+      if (item.Driver_Permit_Issue) {
+        item.Driver_Permit_Issue = new Date(
+          item.Driver_Permit_Issue
+        ).toLocaleDateString();
+      }
+      if (item.Driver_Permit_Expiry) {
+        item.Driver_Permit_Expiry = new Date(
+          item.Driver_Permit_Expiry
+        ).toLocaleDateString();
+      }
+      if (item.Driver_Medical_Expiry) {
+        item.Driver_Medical_Expiry = new Date(
+          item.Driver_Medical_Expiry
+        ).toLocaleDateString();
+      }
+      return item;
+    });
+
+    return res.status(200).json(formattedResponse);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
 module.exports = {
+  getDriverExpiry,
   deleteDriver,
   updateDriver,
   getDriverSearch,

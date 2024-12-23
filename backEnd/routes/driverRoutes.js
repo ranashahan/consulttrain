@@ -13,6 +13,7 @@ const {
   getDriver,
   getDrivers,
   createDriver,
+  getDriverExpiry,
 } = require("../controllers/driverController");
 const {
   getDashboardDriverCounts,
@@ -32,12 +33,10 @@ router
   );
 router
   .route("/nic")
-  .get(
-    ensureAuthenticated,
-    cacheMiddleware,
-    roleAuthorize(constants.ALLROLES),
-    getDriverByNIC
-  );
+  .get(ensureAuthenticated, roleAuthorize(constants.ALLROLES), getDriverByNIC);
+router
+  .route("/expiry")
+  .get(ensureAuthenticated, roleAuthorize(constants.ALLROLES), getDriverExpiry);
 router
   .route("/search")
   .get(
@@ -56,12 +55,7 @@ router
   );
 router
   .route("/:id")
-  .get(
-    ensureAuthenticated,
-    cacheMiddleware,
-    roleAuthorize(constants.ALLROLES),
-    getDriver
-  )
+  .get(ensureAuthenticated, roleAuthorize(constants.ALLROLES), getDriver)
   .put(ensureAuthenticated, roleAuthorize(constants.ALLSTAFF), updateDriver)
   .delete(ensureAuthenticated, roleAuthorize(constants.ALLSTAFF), deleteDriver);
 module.exports = router;

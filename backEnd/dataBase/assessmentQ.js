@@ -65,8 +65,8 @@ const sessionAllTimeFrame = async (req) => {
     FROM session s 
     join session_driver sd on sd.session_id = s.id 
     join driver d on sd.driver_id = d.id 
-    join session_contractor sc on sc.session_id = s.id
-    join contractor c on sc.contractor_id = c.id`;
+    LEFT JOIN session_contractor sc on sc.session_id = s.id
+    LEFT JOIN contractor c on sc.contractor_id = c.id`;
     const conditions = [];
     if (nic) {
       conditions.push(`d.nic LIKE '%${nic}%'`);
@@ -114,6 +114,49 @@ const sessionAllTimeFrame = async (req) => {
 };
 
 /**
+ * This method for search query
+ * @param {string} req request
+ * @returns {result} result
+ */
+const sessionReportTimeFrame = async (req) => {
+  const client = await pool.getConnection();
+  try {
+    const { clientid, contractorid, startDate, endDate } = req.query;
+    console.log(req.query);
+
+    let query = `SELECT * from vsession`;
+    const conditions = [];
+    if (clientid) {
+      conditions.push(`clientid = '${clientid}'`);
+    }
+    if (contractorid) {
+      conditions.push(`contractorid = '${contractorid}'`);
+    }
+    if (startDate) {
+      conditions.push(
+        `DATE(sessiondate) BETWEEN '${startDate}' AND '${endDate}' `
+      );
+    }
+    if (conditions.length > 0) {
+      query +=
+        " WHERE " +
+        conditions.join(" AND ") +
+        "and active=1 order by sessiondate asc ";
+    }
+
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error(
+      "error occurred while session All Time Frame search: " + error
+    );
+    return error;
+  }
+};
+
+/**
  * This method for fetch all the assessments.
  * @returns {result} result
  */
@@ -133,6 +176,40 @@ const assessmentAll = async () => {
     ORDER BY 
     sc.orderid ASC, 
     a.orderid ASC;`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while all assessments: " + error);
+    return error;
+  }
+};
+
+const assessmentAllExp = async () => {
+  const query = `SELECT 
+    mc.id AS mastercategory_id,
+    mc.name AS mastercategory_name,
+    sc.id AS slavecategory_id,
+    sc.name AS slavecategory_name,
+    sc.initials as slavecategory_initials,
+    a.id AS activity_id,
+    a.name AS activity_name,
+    a.initials as activity_initials
+FROM 
+    mastercategory mc
+JOIN 
+    slavecategory sc ON mc.id = sc.mastercategoryid
+JOIN 
+    activity a ON sc.id = a.slavecategoryid
+WHERE 
+mc.active = 1 and
+sc.active = 1 and
+a.active = 1
+ORDER BY 
+    sc.orderid, a.orderid;`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
@@ -415,4 +492,6 @@ module.exports = {
   sessionFindByTrainingID,
   sessionTrainingDelete,
   trainingSessionFind,
+  assessmentAllExp,
+  sessionReportTimeFrame,
 };

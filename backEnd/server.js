@@ -87,6 +87,8 @@ if (process.env.NODE_ENV === "production") {
 // );
 
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/category", require("./routes/categoryRoutes.js"));
+app.use("/api/course", require("./routes/courseRoutes.js"));
 app.use("/api/bloodgroup", require("./routes/bgRoutes.js"));
 app.use("/api/trainer", require("./routes/trainerRoutes.js"));
 app.use("/api/dltype", require("./routes/licensetypeRoutes.js"));

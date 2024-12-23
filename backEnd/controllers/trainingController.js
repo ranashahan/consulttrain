@@ -12,8 +12,8 @@ const createTraining = asyncHandler(async (req, res) => {
   try {
     const {
       name,
-      cource,
-      category,
+      courseid,
+      categoryid,
       plandate,
       startdate,
       enddate,
@@ -60,8 +60,8 @@ const createTraining = asyncHandler(async (req, res) => {
 
     const newtraining = await db.trainingCreate(
       name,
-      cource,
-      category,
+      courseid,
+      categoryid,
       plandate,
       startdate,
       enddate,
@@ -211,8 +211,8 @@ const updateTraining = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const {
       name,
-      cource,
-      category,
+      courseid,
+      categoryid,
       plandate,
       startdate,
       enddate,
@@ -256,8 +256,8 @@ const updateTraining = asyncHandler(async (req, res) => {
     }
     const result = await db.trainingUpdateByID(
       name,
-      cource,
-      category,
+      courseid,
+      categoryid,
       plandate,
       startdate,
       enddate,

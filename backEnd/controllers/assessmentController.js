@@ -218,6 +218,58 @@ const getAssessments = asyncHandler(async (req, res) => {
     res.status(constants.SERVER_ERROR);
   }
 });
+/**
+ * @description get all the assessments
+ * @route GET /api/assessment/getAll
+ * @access private
+ */
+const getAssessmentsExp = asyncHandler(async (req, res) => {
+  try {
+    const results = await db.assessmentAllExp();
+    const categories = results.reduce((acc, row) => {
+      let masterCategory = acc.find((mc) => mc.id === row.mastercategory_id);
+      if (!masterCategory) {
+        masterCategory = {
+          id: row.mastercategory_id,
+          name: row.mastercategory_name,
+          slavecategories: [],
+        };
+        acc.push(masterCategory);
+      }
+
+      let slaveCategory = masterCategory.slavecategories.find(
+        (sc) => sc.id === row.slavecategory_id
+      );
+      if (!slaveCategory) {
+        slaveCategory = {
+          id: row.slavecategory_id,
+          name: row.slavecategory_name,
+          initials: row.slavecategory_initials,
+          activities: [],
+        };
+        masterCategory.slavecategories.push(slaveCategory);
+      }
+
+      slaveCategory.activities.push({
+        id: row.activity_id,
+        name: row.activity_name,
+        initials: row.activity_initials,
+        scoreInitial: null,
+        scoreMiddle: null,
+        scoreFinal: null,
+      });
+
+      return acc;
+    }, []);
+
+    // console.log(categories);
+    // res.json(categories);
+
+    return res.status(constants.SUCCESS).json(categories);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
 
 /**
  * @description get all the assessments
@@ -233,6 +285,54 @@ const getSessionByDate = asyncHandler(async (req, res) => {
       });
     }
     return res.status(constants.SUCCESS).json(results);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
+ * @description get all the assessments
+ * @route GET /api/assessment/getReportByDate
+ * @access private
+ */
+const getSessionReportByDate = asyncHandler(async (req, res) => {
+  try {
+    const results = await db.sessionReportTimeFrame(req);
+    if (!results.length > 0) {
+      return res.status(204).json({
+        message: `Could not found any result`,
+      });
+    }
+
+    let dataFromDatabase = results;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.sessiondate) {
+        item.sessiondate = new Date(item.sessiondate).toLocaleDateString();
+      }
+      if (item.classdate) {
+        item.classdate = new Date(item.classdate).toLocaleDateString();
+      }
+      if (item.yarddate) {
+        item.yarddate = new Date(item.yarddate).toLocaleDateString();
+      }
+      if (item.licenseexpiry) {
+        item.licenseexpiry = new Date(item.licenseexpiry).toLocaleDateString();
+      }
+      if (item.permitexpiry) {
+        item.permitexpiry = new Date(item.permitexpiry).toLocaleDateString();
+      }
+      if (item.permitissue) {
+        item.permitissue = new Date(item.permitissue).toLocaleDateString();
+      }
+      if (item.dob) {
+        item.dob = new Date(item.dob).toLocaleDateString();
+      }
+      return item;
+    });
+    setTimeout(() => {
+      console.log("Message after delay");
+      return res.status(constants.SUCCESS).json(formattedResponse);
+    }, 8000);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -387,4 +487,6 @@ module.exports = {
   createSessionTraining,
   getSessionTraining,
   deleteSessionTraining,
+  getAssessmentsExp,
+  getSessionReportByDate,
 };

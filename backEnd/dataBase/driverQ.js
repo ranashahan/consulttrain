@@ -165,6 +165,7 @@ const driverSessionFindByID = async (id) => {
  * @param {string} permitnumber driver permit number
  * @param {Date} permitissue driver permit issue date
  * @param {Date} permitexpiry driver permit expiry date
+ * @param {Date} medicalexpiry driver medical expiry date
  * @param {number} bloodgroupid driver blood group id
  * @param {number} contractorid driver contractor id
  * @param {number} visualid driver visual id
@@ -187,9 +188,9 @@ const driverUpdateByID = async (
   licenseverified,
   designation,
   department,
-  permitnumber,
   permitissue,
   permitexpiry,
+  medicalexpiry,
   bloodgroupid,
   contractorid,
   visualid,
@@ -201,7 +202,7 @@ const driverUpdateByID = async (
   id
 ) => {
   const query = `UPDATE driver SET name=?, gender=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?,
-  licenseverified=?,designation=?, department=?, permitnumber=?, permitissue=?, permitexpiry=?, bloodgroupid=?, contractorid=?, 
+  licenseverified=?,designation=?, department=?, permitissue=?, permitexpiry=?, medicalexpiry=?, bloodgroupid=?, contractorid=?, 
     visualid=?, ddccount=?, experience=?, code=?, comment=?, modifiedby=? where id=?`;
   const client = await pool.getConnection();
   try {
@@ -217,9 +218,9 @@ const driverUpdateByID = async (
       licenseverified,
       designation,
       department,
-      permitnumber,
       permitissue,
       permitexpiry,
+      medicalexpiry,
       bloodgroupid,
       contractorid,
       visualid,
@@ -287,10 +288,8 @@ const driversAll = async () => {
  * @param {number} licensetypeid driver license type
  * @param {Date} licenseexpiry driver license expiry
  * @param {string} designation driver designation
- * @param {string*} department driver department
- * @param {string} permitnumber driver permit number
- * @param {Date} permitissue driver permit issue date
- * @param {Date} permitexpiry driver permit expiry date
+ * @param {string} department driver department
+ * @param {Date} medicalexpiry driver medical expiry date
  * @param {number} bloodgroupid driver blood group id
  * @param {number} contractorid driver contractor id
  * @param {number} visualid driver visual id
@@ -313,9 +312,7 @@ const driverCreate = async (
   licenseverified,
   designation,
   department,
-  permitnumber,
-  permitissue,
-  permitexpiry,
+  medicalexpiry,
   bloodgroupid,
   contractorid,
   visualid,
@@ -325,9 +322,11 @@ const driverCreate = async (
   comment,
   userid
 ) => {
-  const query = `INSERT INTO driver (name,gender,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
-    department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
-    code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+  const query =
+    "CALL `consulttrain`.`insert_driver`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  // const query = `INSERT INTO driver (name,gender,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
+  //   department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
+  //   code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -342,9 +341,7 @@ const driverCreate = async (
       licenseverified,
       designation,
       department,
-      permitnumber,
-      permitissue,
-      permitexpiry,
+      medicalexpiry,
       bloodgroupid,
       contractorid,
       visualid,
@@ -353,13 +350,32 @@ const driverCreate = async (
       code,
       comment,
       userid,
-      userid,
     ]);
     client.release();
+    console.log(result);
     return result;
   } catch (error) {
     client.release();
     console.error("error occurred while create driver: " + error);
+    return error;
+  }
+};
+
+/**
+ * This method for fetch id via driver license,permit,nic,medical expiry
+ * @param {string} param driver license,permit,nic,medical expiry
+ * @returns {result} result
+ */
+const driversExpiryReport = async (param) => {
+  const query = "CALL `consulttrain`.`getAllExpireDriver`(?);";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [param]);
+    client.release();
+    return result[0][0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while driver find: " + error);
     return error;
   }
 };
@@ -375,4 +391,5 @@ module.exports = {
   driverFindByName,
   driverSearch,
   driverSessionFindByID,
+  driversExpiryReport,
 };
