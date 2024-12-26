@@ -19,6 +19,7 @@ exports.constants = {
 
   CACHETEMPORARYTOKENPREFIX: "temp_token:",
   CACHETEMPORARYTOKENEXPIRESINSECONDS: 180,
+  RECAPTCHA_SECRET_KEY: "6Lc_SaYqAAAAAPFQHhOX-vgIzxYvBsbsEL5dnK91",
   ALLROLES: ["admin", "manager", "staff", "member", "guest"],
   ALLSTAFF: ["admin", "manager", "staff", "member"],
   MANAGERS: ["admin", "manager"],

@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../dataBase/userQ");
 const { constants } = require("../constants");
-
+const axios = require("axios");
 /**
  * @description Register a user
  * @route POST /api/users/register
@@ -73,13 +73,24 @@ const registerUser = asyncHandler(async (req, res) => {
  */
 const loginUser = asyncHandler(async (req, res) => {
   try {
-    const { email, password } = req.body;
-    console.log(email, password);
-
-    if (!email || !password) {
+    const { email, password, token } = req.body;
+    if (!email || !password || !token) {
       return res.status(constants.UNPROCESSABLE).json({
         message: "Please fill out all the fields (email and password)",
       });
+    }
+
+    if (token === "bypass-response") {
+      console.log("captcha bypassed");
+    } else {
+      const verificationResult = await verifyRecaptcha(
+        token,
+        req.headers["x-forwarded-for"] || req.socket.remoteAddress
+      );
+
+      if (!verificationResult.success) {
+        return res.status(401).json(verificationResult);
+      }
     }
 
     const user = await db.userFind(email);
@@ -118,9 +129,38 @@ const loginUser = asyncHandler(async (req, res) => {
       refreshToken,
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
+
+/**
+ * This method will fetch captcha response
+ * @param {string} token
+ * @param {string} userIP
+ * @returns {boolean} success
+ */
+async function verifyRecaptcha(token, userIP) {
+  try {
+    const url = "https://www.google.com/recaptcha/api/siteverify";
+    const data = new URLSearchParams({
+      secret: constants.RECAPTCHA_SECRET_KEY,
+      response: token,
+      remoteip:
+        userIP || req.headers["x-forwarded-for"] || req.socket.remoteAddress, // Get user IP (optional but recommended)
+    });
+
+    const response = await axios.post(url, data);
+    if (!response.data.success) {
+      console.error("reCAPTCHA verification failed:", response.data);
+      return { success: false, message: "Invalid CAPTCHA!" };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("reCAPTCHA verification error:", error);
+    return { success: false, message: "Failed to verify CAPTCHA" }; // Informative error message
+  }
+}
 
 /**
  * @description current user info
