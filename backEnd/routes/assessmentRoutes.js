@@ -17,6 +17,7 @@ const {
   deleteSessionTraining,
   getAssessmentsExp,
   getSessionReportByDate,
+  getSessionReportAll,
 } = require("../controllers/assessmentController");
 const { constants } = require("../constants");
 
@@ -59,6 +60,13 @@ router
     ensureAuthenticated,
     roleAuthorize(constants.ALLSTAFF),
     getSessionReportByDate
+  );
+router
+  .route("/getReportAll")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.ALLSTAFF),
+    getSessionReportAll
   );
 router
   .route("/:id")

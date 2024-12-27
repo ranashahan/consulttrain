@@ -76,7 +76,8 @@ const loginUser = asyncHandler(async (req, res) => {
     const { email, password, token } = req.body;
     if (!email || !password || !token) {
       return res.status(constants.UNPROCESSABLE).json({
-        message: "Please fill out all the fields (email and password)",
+        message:
+          "Please fill out all the fields (email, password & captchatoken)",
       });
     }
 

@@ -332,7 +332,60 @@ const getSessionReportByDate = asyncHandler(async (req, res) => {
     setTimeout(() => {
       console.log("Message after delay");
       return res.status(constants.SUCCESS).json(formattedResponse);
-    }, 8000);
+    }, 2000);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+/**
+ * @description get all the driver + session data
+ * @route GET /api/assessment/getReportAll
+ * @access private
+ */
+const getSessionReportAll = asyncHandler(async (req, res) => {
+  try {
+    const results = await db.sessionReportAll(req);
+    if (!results.length > 0) {
+      return res.status(204).json({
+        message: `Could not found any result`,
+      });
+    }
+
+    let dataFromDatabase = results;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.sessiondate) {
+        item.sessiondate = new Date(item.sessiondate).toLocaleDateString();
+      }
+      if (item.classdate) {
+        item.classdate = new Date(item.classdate).toLocaleDateString();
+      }
+      if (item.yarddate) {
+        item.yarddate = new Date(item.yarddate).toLocaleDateString();
+      }
+      if (item.licenseexpiry) {
+        item.licenseexpiry = new Date(item.licenseexpiry).toLocaleDateString();
+      }
+      if (item.permitexpiry) {
+        item.permitexpiry = new Date(item.permitexpiry).toLocaleDateString();
+      }
+      if (item.permitissue) {
+        item.permitissue = new Date(item.permitissue).toLocaleDateString();
+      }
+      if (item.dob) {
+        item.dob = new Date(item.dob).toLocaleDateString();
+      }
+      if (item.nicexpiry) {
+        item.nicexpiry = new Date(item.nicexpiry).toLocaleDateString();
+      }
+      if (item.medicalexpiry) {
+        item.medicalexpiry = new Date(item.medicalexpiry).toLocaleDateString();
+      }
+      return item;
+    });
+    setTimeout(() => {
+      console.log("Message after delay");
+      return res.status(constants.SUCCESS).json(formattedResponse);
+    }, 2000);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -489,4 +542,5 @@ module.exports = {
   deleteSessionTraining,
   getAssessmentsExp,
   getSessionReportByDate,
+  getSessionReportAll,
 };
