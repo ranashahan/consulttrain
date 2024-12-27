@@ -118,11 +118,137 @@ const sessionAllTimeFrame = async (req) => {
  * @param {string} req request
  * @returns {result} result
  */
+const sessionReportAll = async (req) => {
+  const client = await pool.getConnection();
+  try {
+    const {
+      licensetypeid,
+      bloodgroupid,
+      visualid,
+      locationid,
+      resultid,
+      stageid,
+      vehicleid,
+      titleid,
+      trainerid,
+      contractorid,
+      startDate,
+      endDate,
+    } = req.query;
+    // console.log(req.query);
+
+    let query = `SELECT d.id AS driverid
+	,d.name AS drivername
+	,d.gender
+	,d.dob
+	,d.nic
+	,d.nicexpiry
+	,d.licensenumber
+	,d.licensetypeid
+	,d.licenseexpiry
+	,d.licenseverified
+	,d.designation
+	,d.department
+	,d.permitnumber
+	,d.permitissue
+	,d.permitexpiry
+	,d.medicalexpiry
+	,d.bloodgroupid
+	,d.contractorid AS drivercontractorid
+	,d.visualid
+	,d.ddccount
+	,d.experience
+	,d.code
+	,d.comment AS drivercomment
+	,s.id AS sessionid
+	,s.name AS sessioname
+	,s.sessiondate
+	,s.locationid
+	,s.resultid
+	,s.stageid
+	,s.titleid
+	,s.vehicleid
+	,s.classdate
+	,s.yarddate
+	,s.weather
+	,s.traffic
+	,s.route
+	,s.quizscore
+	,s.comment AS sessioncomment
+	,c.id AS sessioncontractorid
+	,t.id AS trainerid
+FROM session s
+JOIN session_driver sd ON sd.session_id = s.id
+LEFT JOIN driver d ON d.id = sd.driver_id
+LEFT JOIN session_contractor sc ON sc.session_id = s.id
+LEFT JOIN session_trainer st ON st.session_id = s.id
+LEFT JOIN trainer t ON t.id = st.trainer_id
+LEFT JOIN contractor c ON c.id = sc.contractor_id`;
+    const conditions = [];
+    if (licensetypeid) {
+      conditions.push(`d.licensetypeid = '${licensetypeid}'`);
+    }
+    if (bloodgroupid) {
+      conditions.push(`d.bloodgroupid = '${bloodgroupid}'`);
+    }
+    if (visualid) {
+      conditions.push(`d.visualid = '${visualid}'`);
+    }
+    if (contractorid) {
+      conditions.push(`sc.contractor_id = '${contractorid}'`);
+    }
+    if (locationid) {
+      conditions.push(`s.locationid = '${locationid}'`);
+    }
+    if (resultid) {
+      conditions.push(`s.resultid = '${resultid}'`);
+    }
+    if (titleid) {
+      conditions.push(`s.titleid = '${titleid}'`);
+    }
+    if (stageid) {
+      conditions.push(`s.stageid = '${stageid}'`);
+    }
+    if (vehicleid) {
+      conditions.push(`s.vehicleid = '${vehicleid}'`);
+    }
+    if (trainerid) {
+      conditions.push(`st.trainer_id = '${trainerid}'`);
+    }
+    if (startDate) {
+      conditions.push(
+        `DATE(s.sessiondate) BETWEEN '${startDate}' AND '${endDate}' `
+      );
+    }
+    if (conditions.length > 0) {
+      query +=
+        " WHERE " +
+        conditions.join(" AND ") +
+        "and s.active = 1 and d.active = 1  order by s.sessiondate asc ";
+    }
+    // console.log(query);
+
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error(
+      "error occurred while session All Time Frame search: " + error
+    );
+    return error;
+  }
+};
+/**
+ * This method for search query
+ * @param {string} req request
+ * @returns {result} result
+ */
 const sessionReportTimeFrame = async (req) => {
   const client = await pool.getConnection();
   try {
     const { clientid, contractorid, startDate, endDate } = req.query;
-    console.log(req.query);
+    //console.log(req.query);
 
     let query = `SELECT * from vsession`;
     const conditions = [];
@@ -494,4 +620,5 @@ module.exports = {
   trainingSessionFind,
   assessmentAllExp,
   sessionReportTimeFrame,
+  sessionReportAll,
 };
