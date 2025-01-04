@@ -134,7 +134,7 @@ const getTrainings = asyncHandler(async (req, res) => {
       return item;
     });
 
-    return res.status(200).json(formattedResponse);
+    return res.status(constants.SUCCESS).json(formattedResponse);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }

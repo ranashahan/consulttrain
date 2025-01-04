@@ -122,6 +122,7 @@ const sessionReportAll = async (req) => {
   const client = await pool.getConnection();
   try {
     const {
+      name,
       licensetypeid,
       bloodgroupid,
       visualid,
@@ -196,6 +197,9 @@ LEFT JOIN contractor c ON c.id = sc.contractor_id`;
     }
     if (contractorid) {
       conditions.push(`sc.contractor_id = '${contractorid}'`);
+    }
+    if (name) {
+      conditions.push(`s.name LIKE '%${name}%'`);
     }
     if (locationid) {
       conditions.push(`s.locationid = '${locationid}'`);

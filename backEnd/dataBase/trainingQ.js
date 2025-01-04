@@ -76,7 +76,7 @@ const trainingAllTimeFrame = async (req) => {
     } = req.query;
 
     let query = `select id, name, courseid, categoryid, plandate, clientid, contractorid, trainerid, 
-    total, amountreceived from training`;
+    total, amountreceived, status from training`;
     const conditions = [];
     if (name) {
       conditions.push(`name LIKE '%${name}%'`);

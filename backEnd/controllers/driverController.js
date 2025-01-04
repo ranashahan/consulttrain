@@ -174,6 +174,41 @@ const getDriver = asyncHandler(async (req, res) => {
     res.status(constants.SERVER_ERROR);
   }
 });
+
+/**
+ * @description get driver sessions from driver ID
+ * @route GET /api/driver/session:id
+ * @access private
+ */
+const getDriverSession = asyncHandler(async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (!id) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: "Please provide param (id)",
+      });
+    }
+    const result = await db.driverSessionByID(id);
+    if (!result.length > 0) {
+      return res.status(201).json({
+        message: `does not find any record against ${id}`,
+      });
+    }
+    let dataFromDatabase = result;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.classdate) {
+        item.classdate = new Date(item.classdate).toLocaleDateString();
+      }
+      if (item.sessiondate) {
+        item.sessiondate = new Date(item.sessiondate).toLocaleDateString();
+      }
+      return item;
+    });
+    return res.status(constants.SUCCESS).json(formattedResponse);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
 /**
  * @description get driver from ID
  * @route GET /api/driver/nic
@@ -241,6 +276,12 @@ const getDriverSearch = asyncHandler(async (req, res) => {
     const formattedResponse = dataFromDatabase.map((item) => {
       if (item.dob) {
         item.dob = new Date(item.dob).toLocaleDateString();
+      }
+      if (item.created_at) {
+        item.created_at = new Date(item.created_at).toLocaleDateString();
+      }
+      if (item.modified_at) {
+        item.modified_at = new Date(item.modified_at).toLocaleDateString();
       }
       if (item.nicexpiry) {
         item.nicexpiry = new Date(item.nicexpiry).toLocaleDateString();
@@ -445,4 +486,5 @@ module.exports = {
   getDriver,
   getDrivers,
   createDriver,
+  getDriverSession,
 };
