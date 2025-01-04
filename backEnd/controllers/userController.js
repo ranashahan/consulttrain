@@ -313,6 +313,52 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @description update user password against body id
+ * @route PUT /api/users/resetpassword
+ * @access private
+ */
+const resetUserPassword = asyncHandler(async (req, res) => {
+  try {
+    const { id, oldpassword, newpassword, userid } = req.body;
+
+    if (!id || !oldpassword || !newpassword || !userid) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message:
+          "Please fill in all fields (id, oldpassword, newpassword and userid)",
+      });
+    }
+
+    const user = await db.userFindByID(id);
+    if (user.length < 1) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: `wrong param (id ${id}) provided`,
+      });
+    }
+
+    const currentUserid = user[0].userid;
+    if (id != currentUserid) {
+      res.status(constants.FORBIDDIN).json({
+        message: `Provided (id ${id}) and database id does not match`,
+      });
+    }
+    const passwordMatch = await bcrypt.compare(oldpassword, user[0].password);
+    if (!passwordMatch) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message:
+          "Current Password did not match, please insert correct password",
+      });
+    }
+    const hashedPassword = await bcrypt.hash(newpassword, 10);
+
+    const result = await db.userUpdatePasswordByID(hashedPassword, userid, id);
+
+    return res.status(constants.CREATED).json(result);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
  * @description delete user against param id
  * @route DELETE /api/users/:id
  * @access private
@@ -438,4 +484,5 @@ module.exports = {
   deleteUser,
   logoutUser,
   updateUserPassword,
+  resetUserPassword,
 };

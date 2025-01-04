@@ -383,7 +383,7 @@ const getSessionReportAll = asyncHandler(async (req, res) => {
       return item;
     });
     setTimeout(() => {
-      console.log("Message after delay");
+      //console.log("Message after delay");
       return res.status(constants.SUCCESS).json(formattedResponse);
     }, 2000);
   } catch (error) {

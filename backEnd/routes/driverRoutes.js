@@ -14,6 +14,7 @@ const {
   getDrivers,
   createDriver,
   getDriverExpiry,
+  getDriverSession,
 } = require("../controllers/driverController");
 const {
   getDashboardDriverCounts,
@@ -52,6 +53,13 @@ router
     cacheMiddleware,
     roleAuthorize(constants.ALLSTAFF),
     getDashboardDriverCounts
+  );
+router
+  .route("/sessiondriver")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.ALLROLES),
+    getDriverSession
   );
 router
   .route("/:id")

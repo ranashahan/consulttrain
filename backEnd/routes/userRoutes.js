@@ -16,6 +16,7 @@ const {
   deleteUser,
   logoutUser,
   updateUserPassword,
+  resetUserPassword,
 } = require("../controllers/userController");
 const { constants } = require("../constants");
 
@@ -46,6 +47,13 @@ router
     ensureAuthenticated,
     roleAuthorize(constants.MANAGERS),
     updateUserPassword
+  );
+router
+  .route("/resetpassword")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.ALLROLES),
+    resetUserPassword
   );
 router.route("/login/refreshtoken").post(refreshToken);
 

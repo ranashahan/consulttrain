@@ -49,12 +49,13 @@ const driverSearch = async (req) => {
       nic,
       licensenumber,
       permitnumber,
-      permitexpiry,
       contractorid,
+      startDate,
+      endDate,
     } = req.query;
-
     let query =
-      "SELECT id,name,nic,licensetypeid,licensenumber,licenseexpiry,permitnumber,permitissue,permitexpiry,contractorid FROM driver";
+      // "SELECT id,name,nic,licensetypeid,licensenumber,licenseexpiry,permitnumber,permitissue,permitexpiry,contractorid FROM driver";
+      "SELECT * FROM driver";
     const conditions = [];
     if (nic) {
       conditions.push(`nic LIKE '%${nic}%'`);
@@ -71,8 +72,10 @@ const driverSearch = async (req) => {
     if (permitnumber) {
       conditions.push(`permitnumber LIKE '%${permitnumber}%'`);
     }
-    if (permitexpiry) {
-      conditions.push(`permitexpiry = '${permitexpiry}'`);
+    if (startDate) {
+      conditions.push(
+        `DATE(created_at) BETWEEN '${startDate}' AND '${endDate}' `
+      );
     }
 
     if (conditions.length > 0) {
@@ -128,6 +131,30 @@ const driverFindByID = async (id) => {
   } catch (error) {
     client.release();
     console.error("error occurred while driver find by id: " + error);
+    return error;
+  }
+};
+
+/**
+ * This method use to fetch driver by ID
+ * @param {string} id driver param id
+ * @returns {result} result
+ */
+const driverSessionByID = async (id) => {
+  const query = `select id,name,sessiondate,classdate,locationid,resultid,stageid,titleid, quizscore,totalscore 
+ from session 
+ where active = 1 
+ and  id in (select session_id from session_driver where driver_id = ?) 
+ order by sessiondate desc;`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [id]);
+    client.release();
+    return result[0];
+    // return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while driver session find by id: " + error);
     return error;
   }
 };
@@ -392,4 +419,5 @@ module.exports = {
   driverSearch,
   driverSessionFindByID,
   driversExpiryReport,
+  driverSessionByID,
 };
