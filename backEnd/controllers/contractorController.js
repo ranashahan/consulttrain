@@ -22,7 +22,6 @@ const createContractor = asyncHandler(async (req, res) => {
       clientid,
     } = req.body.obj;
     const { userid } = req.body;
-    console.log(req.body);
 
     if (!name || !userid || !clientid) {
       return res.status(constants.UNPROCESSABLE).json({

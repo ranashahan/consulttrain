@@ -59,7 +59,7 @@ const trainingID = async (id) => {
 /**
  * This method for search query
  * @param {string} req request
- * @returns {result} result
+ * @returns {result} results
  */
 const trainingAllTimeFrame = async (req) => {
   const client = await pool.getConnection();
@@ -76,7 +76,8 @@ const trainingAllTimeFrame = async (req) => {
     } = req.query;
 
     let query = `select id, name, courseid, categoryid, plandate, clientid, contractorid, trainerid, 
-    total, amountreceived, status from training`;
+    total, amountreceived, status, (select count(session_id) from training_session where training_id  = id) as sessioncount 
+    from training`;
     const conditions = [];
     if (name) {
       conditions.push(`name LIKE '%${name}%'`);
@@ -107,7 +108,6 @@ const trainingAllTimeFrame = async (req) => {
         conditions.join(" AND ") +
         "and active=1 order by created_at desc limit 200";
     }
-    // console.log(query);
     const result = await client.query(query);
     client.release();
     return result[0];

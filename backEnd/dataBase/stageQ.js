@@ -56,7 +56,7 @@ const stageUpdateByID = async (name, description, userid, id) => {
     return result;
   } catch (error) {
     client.release();
-    console.log("error occurred while stage update by ID: " + error);
+    console.error("error occurred while stage update by ID: " + error);
     return error;
   }
 };

@@ -36,12 +36,7 @@ router
 
 router
   .route("/:id")
-  .get(
-    ensureAuthenticated,
-    cacheMiddleware,
-    roleAuthorize(constants.MANAGERS),
-    getTraining
-  )
+  .get(ensureAuthenticated, roleAuthorize(constants.MANAGERS), getTraining)
   .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updateTraining)
   .delete(
     ensureAuthenticated,

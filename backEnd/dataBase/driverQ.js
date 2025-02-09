@@ -84,7 +84,6 @@ const driverSearch = async (req) => {
         conditions.join(" AND ") +
         " and active=1 order by created_at desc limit 200";
     }
-    // console.log(query);
     const result = await client.query(query);
     client.release();
     return result[0];
@@ -105,6 +104,24 @@ const driverFindByLicense = async (licensenumber) => {
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [licensenumber]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while driver find: " + error);
+    return error;
+  }
+};
+/**
+ * This method for fetch id via driver license number
+ * @param {string} permit driver license number
+ * @returns {result} result
+ */
+const driverFindByPermit = async (permit) => {
+  const query = "select * from driver where permitnumber=? and active=1";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [permit]);
     client.release();
     return result[0];
   } catch (error) {
@@ -215,6 +232,7 @@ const driverUpdateByID = async (
   licenseverified,
   designation,
   department,
+  permitnumber,
   permitissue,
   permitexpiry,
   medicalexpiry,
@@ -229,7 +247,7 @@ const driverUpdateByID = async (
   id
 ) => {
   const query = `UPDATE driver SET name=?, gender=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?,
-  licenseverified=?,designation=?, department=?, permitissue=?, permitexpiry=?, medicalexpiry=?, bloodgroupid=?, contractorid=?, 
+  licenseverified=?,designation=?, department=?, permitnumber=?, permitissue=?, permitexpiry=?, medicalexpiry=?, bloodgroupid=?, contractorid=?, 
     visualid=?, ddccount=?, experience=?, code=?, comment=?, modifiedby=? where id=?`;
   const client = await pool.getConnection();
   try {
@@ -238,16 +256,17 @@ const driverUpdateByID = async (
       gender,
       dob,
       nic,
-      nicexpiry,
+      nicexpiry || null,
       licensenumber,
       licensetypeid,
-      licenseexpiry,
+      licenseexpiry || null,
       licenseverified,
       designation,
       department,
-      permitissue,
-      permitexpiry,
-      medicalexpiry,
+      permitnumber,
+      permitissue || null,
+      permitexpiry || null,
+      medicalexpiry || null,
       bloodgroupid,
       contractorid,
       visualid,
@@ -336,6 +355,9 @@ const driverCreate = async (
   licensenumber,
   licensetypeid,
   licenseexpiry,
+  permitnumber,
+  permitissue,
+  permitexpiry,
   licenseverified,
   designation,
   department,
@@ -350,7 +372,7 @@ const driverCreate = async (
   userid
 ) => {
   const query =
-    "CALL `consulttrain`.`insert_driver`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "CALL `consulttrain`.`insert_driver`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   // const query = `INSERT INTO driver (name,gender,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
   //   department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
   //   code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
@@ -365,6 +387,9 @@ const driverCreate = async (
       licensenumber,
       licensetypeid,
       licenseexpiry,
+      permitnumber,
+      permitissue,
+      permitexpiry,
       licenseverified,
       designation,
       department,
@@ -379,7 +404,6 @@ const driverCreate = async (
       userid,
     ]);
     client.release();
-    console.log(result);
     return result;
   } catch (error) {
     client.release();
@@ -420,4 +444,5 @@ module.exports = {
   driverSessionFindByID,
   driversExpiryReport,
   driverSessionByID,
+  driverFindByPermit,
 };
