@@ -46,7 +46,8 @@ const findbyUsername = async (username) => {
  * @returns {result} result
  */
 const userFindByID = async (id) => {
-  const query = "select * from users where userid=? and active = 1";
+  const query = `select userid, username, email, name, mobile, company, designation, imagepath, role 
+  from users where userid=? and active = 1`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [id]);
@@ -139,7 +140,7 @@ const userDeleteByID = async (id) => {
     return result;
   } catch (error) {
     client.release();
-    console.log("error occurred while user delete: " + error);
+    console.error("error occurred while user delete: " + error);
     return error;
   }
 };
@@ -149,7 +150,8 @@ const userDeleteByID = async (id) => {
  * @returns {result} result
  */
 const allUsers = async () => {
-  const query = "select * from users where active=1";
+  const query = `SELECT userid, username, email, name, mobile, company, designation, imagepath, role 
+  FROM consulttrain.users where active=1`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

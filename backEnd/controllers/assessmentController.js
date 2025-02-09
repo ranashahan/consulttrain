@@ -262,9 +262,6 @@ const getAssessmentsExp = asyncHandler(async (req, res) => {
       return acc;
     }, []);
 
-    // console.log(categories);
-    // res.json(categories);
-
     return res.status(constants.SUCCESS).json(categories);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
@@ -329,10 +326,10 @@ const getSessionReportByDate = asyncHandler(async (req, res) => {
       }
       return item;
     });
-    setTimeout(() => {
-      console.log("Message after delay");
-      return res.status(constants.SUCCESS).json(formattedResponse);
-    }, 2000);
+    return res.status(constants.SUCCESS).json(formattedResponse);
+    // setTimeout(() => {
+    //   return res.status(constants.SUCCESS).json(formattedResponse);
+    // }, 2000);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -382,10 +379,10 @@ const getSessionReportAll = asyncHandler(async (req, res) => {
       }
       return item;
     });
-    setTimeout(() => {
-      //console.log("Message after delay");
-      return res.status(constants.SUCCESS).json(formattedResponse);
-    }, 2000);
+    return res.status(constants.SUCCESS).json(formattedResponse);
+    // setTimeout(() => {
+    //   return res.status(constants.SUCCESS).json(formattedResponse);
+    // }, 2000);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }

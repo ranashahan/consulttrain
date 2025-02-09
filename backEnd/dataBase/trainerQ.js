@@ -29,7 +29,6 @@ const trainerinitialsFind = async (initials) => {
   try {
     const result = await client.query(query, [initials]);
     client.release();
-    console.log(result[0]);
     return result[0];
   } catch (error) {
     client.release();

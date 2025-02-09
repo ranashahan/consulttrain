@@ -31,7 +31,6 @@ const sessionTrainingFind = async (trainingId, sessionIds) => {
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [trainingId, sessionIds]);
-    console.log(result[0]);
     client.release();
     return result[0];
   } catch (error) {
@@ -136,8 +135,6 @@ const sessionReportAll = async (req) => {
       startDate,
       endDate,
     } = req.query;
-    // console.log(req.query);
-
     let query = `SELECT d.id AS driverid
 	,d.name AS drivername
 	,d.gender
@@ -230,7 +227,6 @@ LEFT JOIN contractor c ON c.id = sc.contractor_id`;
         conditions.join(" AND ") +
         "and s.active = 1 and d.active = 1  order by s.sessiondate asc ";
     }
-    // console.log(query);
 
     const result = await client.query(query);
     client.release();
@@ -252,7 +248,6 @@ const sessionReportTimeFrame = async (req) => {
   const client = await pool.getConnection();
   try {
     const { clientid, contractorid, startDate, endDate } = req.query;
-    //console.log(req.query);
 
     let query = `SELECT * from vsession`;
     const conditions = [];
@@ -594,7 +589,6 @@ const sessionDeleteByID = async (id) => {
  */
 const insertSessionWithTraining = async (trainingId, sessionIds) => {
   const values = sessionIds.map((sessionId) => [trainingId, sessionId]);
-  console.log(values);
   const query =
     "INSERT INTO training_session (training_id, session_id) VALUES ?;";
   const client = await pool.getConnection();

@@ -18,6 +18,9 @@ const createDriver = asyncHandler(async (req, res) => {
       licensenumber,
       licensetypeid,
       licenseexpiry,
+      permitnumber,
+      permitissue,
+      permitexpiry,
       licenseverified,
       designation,
       department,
@@ -35,21 +38,28 @@ const createDriver = asyncHandler(async (req, res) => {
     if (!name || !licensenumber || !nic || !userid) {
       return res.status(constants.UNPROCESSABLE).json({
         message:
-          "Please fill in all fields (driver name license number, NIC and userid)",
+          "Please fill in all fields (driver name, license number, NIC and userid)",
       });
     }
     const [driverNIC] = await db.driverFindByNIC(nic);
     if (driverNIC) {
       return res
         .status(constants.CONFLICT)
-        .json({ message: "driver already existed with nic " + nic });
+        .json({ message: "NIC number already existed with " + nic });
     }
-    if (licensenumber) {
-      const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
-      if (driverLicenseNumber) {
+
+    const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
+    if (driverLicenseNumber) {
+      return res.status(constants.CONFLICT).json({
+        message: "License number already existed with " + licensenumber,
+      });
+    }
+
+    if (permitnumber) {
+      const [driverPermitNumber] = await db.driverFindByPermit(permitnumber);
+      if (driverPermitNumber) {
         return res.status(constants.CONFLICT).json({
-          message:
-            "driver already existed with license number " + licensenumber,
+          message: "Permit number already existed with " + permitnumber,
         });
       }
     }
@@ -63,6 +73,9 @@ const createDriver = asyncHandler(async (req, res) => {
       licensenumber,
       licensetypeid,
       licenseexpiry,
+      permitnumber,
+      permitissue,
+      permitexpiry,
       licenseverified,
       designation,
       department,
@@ -76,17 +89,11 @@ const createDriver = asyncHandler(async (req, res) => {
       comment,
       userid
     );
-    const driverID = JSON.stringify(newDriver[0]);
-    console.log(driverID);
 
     return res.status(201).json({
-      message: `Driver created successfully with driverID: ${
-        JSON.parse(driverID).insertId
-      }`,
+      message: `Driver created successfully`,
     });
   } catch (error) {
-    console.log(error.message);
-
     return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
@@ -328,6 +335,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       licenseverified,
       designation,
       department,
+      permitnumber,
       permitissue,
       permitexpiry,
       medicalexpiry,
@@ -340,17 +348,56 @@ const updateDriver = asyncHandler(async (req, res) => {
       comment,
       userid,
     } = req.body;
+
     if (!id) {
       return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
+
     const driver = await db.driverFindByID(id);
     if (driver.length < 1) {
       return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
+
+    if (!name || !licensenumber || !nic || !userid) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message:
+          "Please fill in all fields (driver name, license number, NIC and userid)",
+      });
+    }
+
+    const [driverNIC] = await db.driverFindByNIC(nic);
+    if (driverNIC) {
+      if (driverNIC.id != id) {
+        return res
+          .status(constants.CONFLICT)
+          .json({ message: "NIC number already existed with " + nic });
+      }
+    }
+
+    const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
+    if (driverLicenseNumber) {
+      if (driverLicenseNumber.id != id) {
+        return res.status(constants.CONFLICT).json({
+          message: "License number already existed with " + licensenumber,
+        });
+      }
+    }
+
+    if (permitnumber) {
+      const [driverPermitNumber] = await db.driverFindByPermit(permitnumber);
+      if (driverPermitNumber) {
+        if (driverPermitNumber.id != id) {
+          return res.status(constants.CONFLICT).json({
+            message: "Permit number already existed with " + permitnumber,
+          });
+        }
+      }
+    }
+
     const result = await db.driverUpdateByID(
       name,
       gender,
@@ -363,6 +410,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       licenseverified,
       designation,
       department,
+      permitnumber,
       permitissue,
       permitexpiry,
       medicalexpiry,

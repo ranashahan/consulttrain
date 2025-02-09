@@ -9,21 +9,6 @@ const path = require("path");
 const dotenv = require("dotenv");
 dotenv.config();
 
-// const accessLogStream = fs.createWriteStream(
-//   path.join(__dirname, "access.log"),
-//   { flags: "a" }
-// );
-
-// Function to generate the filename based on the date
-// const getLogFilename = (time, index) => {
-//   if (!time) return "access.log"; // Default file name
-//   const date = new Date(time);
-//   const year = date.getFullYear();
-//   const month = String(date.getMonth() + 1).padStart(2, "0");
-//   const day = String(date.getDate()).padStart(2, "0");
-//   return `access-${year}-${month}-${day}.log`; // Example: access-2024-11-14.log
-// };
-
 const getLogFilename = () => {
   const date = new Date();
   const year = date.getFullYear();
@@ -48,7 +33,7 @@ const port = process.env.PORT || 5000;
 
 const corsOptions = {
   origin: "*", // or specify allowed origins like 'http://localhost:4200'
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"], // specify the headers you're using
   credentials: true, // if you need to include cookies or authorization headers
   maxAge: 600, // Cache preflight response for 10 minutes
@@ -72,19 +57,36 @@ if (process.env.NODE_ENV === "production") {
   // );
 }
 
-// app.use(
-//   helmet({
-//     contentSecurityPolicy: {
-//       directives: {
-//         defaultSrc: ["'self'"],
-//         scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts
-//         connectSrc: ["'self'", "http://192.168.0.143:5001/*"], // Allow API connection
-//         imgSrc: ["'self'", "data:"],
-//         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
-//       },
-//     },
-//   })
-// );
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginOpenerPolicy: "same-origin-allow-popups",
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'",
+          "https://www.google.com",
+          "https://www.gstatic.com",
+        ], // Allow inline scripts
+        scriptSrcAttr: ["'unsafe-inline'"],
+        connectSrc: [
+          "'self'",
+          `https://${process.env.URL}:${port}/`,
+          `http://${process.env.URL}:${port}/`,
+        ], // Allow API connection
+        imgSrc: ["'self'", "data:"],
+        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+        // fontSrc: ["'self'", "https://fonts.googleapis.com"],
+        objectSrc: ["'none'"],
+        frameSrc: ["'self'", "https://www.google.com"],
+        upgradeInsecureRequests: [],
+      },
+    },
+  })
+);
 
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/category", require("./routes/categoryRoutes.js"));
@@ -107,7 +109,11 @@ app.use("/api/assessment", require("./routes/assessmentRoutes.js"));
 // Serve the Angular app's static files from the dist folder
 app.use(express.static(path.join(__dirname, "consult-train/browser")));
 
+/* */
 // Route all other requests to the Angular app's index.html
+/**
+ * This is website page action
+ */
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "consult-train/browser/index.html"));
 });

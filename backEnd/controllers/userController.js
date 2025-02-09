@@ -130,7 +130,6 @@ const loginUser = asyncHandler(async (req, res) => {
       refreshToken,
     });
   } catch (error) {
-    console.log(error.message);
     return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
@@ -153,12 +152,10 @@ async function verifyRecaptcha(token, userIP) {
 
     const response = await axios.post(url, data);
     if (!response.data.success) {
-      console.error("reCAPTCHA verification failed:", response.data);
       return { success: false, message: "Invalid CAPTCHA!" };
     }
     return { success: true };
   } catch (error) {
-    console.error("reCAPTCHA verification error:", error);
     return { success: false, message: "Failed to verify CAPTCHA" }; // Informative error message
   }
 }
@@ -295,8 +292,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
     }
 
     const currentUserid = user[0].userid;
-    if (id == currentUserid) {
-    } else {
+    if (id != currentUserid) {
       res.status(constants.FORBIDDIN).json({
         message: `Provided (id ${id}) and database id does not match`,
       });
@@ -465,7 +461,6 @@ const logoutUser = asyncHandler(async (req, res) => {
         .status(constants.UNPROCESSABLE)
         .json({ message: "userid not found" });
     }
-    // console.log("i am in logout user and my id is " + userid);
     await db.deleteRefreshToken(userid);
     return res.status(204).send();
   } catch (error) {
