@@ -59,8 +59,8 @@ const createAssessment = asyncHandler(async (req, res) => {
       titleId,
       vehicleId,
       totalScore,
-      classdate,
-      yarddate,
+      classdate || null,
+      yarddate || null,
       weather,
       traffic,
       route,
@@ -182,48 +182,6 @@ const deleteSessionTraining = asyncHandler(async (req, res) => {
  * @access private
  */
 const getAssessments = asyncHandler(async (req, res) => {
-  try {
-    const results = await db.assessmentAll();
-    const categories = [];
-
-    results.forEach((row) => {
-      let category = categories.find((c) => c.name === row.categoryName);
-      if (!category) {
-        category = {
-          id: row.categoryId,
-          name: row.categoryName,
-          initials: row.categoryInitials,
-          selected: false,
-          assessments: [],
-        };
-        categories.push(category);
-      }
-
-      if (row.activityId) {
-        category.assessments.push({
-          id: row.activityId,
-          name: row.activityName,
-          initials: row.activityInitials,
-          scoreInitial: null,
-          scoreMiddle: null,
-          scoreFinal: null,
-        });
-      }
-    });
-
-    // res.json(categories);
-
-    return res.status(constants.SUCCESS).json(categories);
-  } catch (error) {
-    res.status(constants.SERVER_ERROR);
-  }
-});
-/**
- * @description get all the assessments
- * @route GET /api/assessment/getAll
- * @access private
- */
-const getAssessmentsExp = asyncHandler(async (req, res) => {
   try {
     const results = await db.assessmentAllExp();
     const categories = results.reduce((acc, row) => {
@@ -537,7 +495,6 @@ module.exports = {
   createSessionTraining,
   getSessionTraining,
   deleteSessionTraining,
-  getAssessmentsExp,
   getSessionReportByDate,
   getSessionReportAll,
 };
