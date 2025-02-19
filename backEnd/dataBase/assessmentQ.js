@@ -287,34 +287,8 @@ const sessionReportTimeFrame = async (req) => {
  */
 const assessmentAll = async () => {
   const query = `SELECT 
-      sc.id AS categoryId, 
-      sc.name AS categoryName, 
-      a.id AS activityId, 
-      a.name AS activityName,
-      a.orderid as activityOrder,
-      sc.initials as categoryInitials,
-      a.initials as activityInitials
-    FROM slavecategory sc
-    LEFT JOIN activity a ON sc.id = a.slavecategoryid
-    where a.active = 1
-    and sc.active = 1 
-    ORDER BY 
-    sc.orderid ASC, 
-    a.orderid ASC;`;
-  const client = await pool.getConnection();
-  try {
-    const result = await client.query(query);
-    client.release();
-    return result[0];
-  } catch (error) {
-    client.release();
-    console.error("error occurred while all assessments: " + error);
-    return error;
-  }
-};
-
-const assessmentAllExp = async () => {
-  const query = `SELECT 
+    sp.id as supercategory_id,
+    sp.name as supercategory_name,
     mc.id AS mastercategory_id,
     mc.name AS mastercategory_name,
     sc.id AS slavecategory_id,
@@ -324,12 +298,15 @@ const assessmentAllExp = async () => {
     a.name AS activity_name,
     a.initials as activity_initials
 FROM 
-    mastercategory mc
+    supercategory sp
+JOIN
+    mastercategory mc ON sp.id = mc.supercategoryid
 JOIN 
     slavecategory sc ON mc.id = sc.mastercategoryid
 JOIN 
     activity a ON sc.id = a.slavecategoryid
 WHERE 
+sp.active = 1 and
 mc.active = 1 and
 sc.active = 1 and
 a.active = 1
@@ -369,6 +346,7 @@ ORDER BY
  * @returns {result} result
  */
 const insertAssessment = async (
+  formid,
   sessionName,
   sessionDate,
   locationId,
@@ -391,6 +369,7 @@ const insertAssessment = async (
   assessmentData
 ) => {
   const params = [
+    formid,
     sessionName,
     sessionDate,
     locationId,
@@ -412,7 +391,7 @@ const insertAssessment = async (
     contractorid,
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
-  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, params);
@@ -616,7 +595,6 @@ module.exports = {
   sessionFindByTrainingID,
   sessionTrainingDelete,
   trainingSessionFind,
-  assessmentAllExp,
   sessionReportTimeFrame,
   sessionReportAll,
 };

@@ -45,7 +45,8 @@ const contractorFindByID = async (id) => {
  * @param {string} contact contractor contact info
  * @param {string} address contractor address
  * @param {string} initials contractor initials
- * @param {string} clientid clientid
+ * @param {number} clientid clientid
+ * @param {number} industriesid industries id
  * @param {string} userid user userid as modified by
  * @param {int} id contractor id
  * @returns {result} result
@@ -61,11 +62,13 @@ const contractorUpdateByID = async (
   address,
   initials,
   clientid,
+  industriesid,
   userid,
   id
 ) => {
-  const query =
-    "UPDATE contractor SET name=?,description=?, ntnnumber=?,contactname=?,contactnumber=?,contactdesignation=?,contactdepartment=?,address=?,initials=?,clientid=?, modifiedby=? where id=?";
+  const query = `UPDATE contractor SET name=?,description=?, ntnnumber=?,contactname=?,contactnumber=?,
+    contactdesignation=?,contactdepartment=?,address=?,initials=?,clientid=?,industriesid=?, 
+    modifiedby=? where id=?`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -79,6 +82,7 @@ const contractorUpdateByID = async (
       address,
       initials,
       clientid,
+      industriesid,
       userid,
       id,
     ]);
@@ -153,11 +157,12 @@ const contractorCreate = async (
   address,
   initials,
   clientid,
+  industriesid,
   userid
 ) => {
   const query = `INSERT INTO contractor (name, description, ntnnumber, contactname, contactnumber, 
-  contactdesignation, contactdepartment, address, initials,clientid,
-     createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`;
+  contactdesignation, contactdepartment, address, initials,clientid,industriesid,
+     createdby, modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -171,6 +176,7 @@ const contractorCreate = async (
       address,
       initials,
       clientid,
+      industriesid,
       userid,
       userid,
     ]);

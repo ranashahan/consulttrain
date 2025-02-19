@@ -41,17 +41,33 @@ const mcFindByID = async (id) => {
 /**
  * This method will update mastercategory via id
  * @param {string} name mastercategory name
- * @param {string} description mastercategory name
+ * @param {string} description mastercategory description
+ * @param {number} supercategoryid supercategoryid
+ * @param {number} orderid orderid
  * @param {string} userid user userid as modified by
  * @param {int} id mastercategory id
  * @returns {result} result
  */
-const mcUpdateByID = async (name, description, userid, id) => {
+const mcUpdateByID = async (
+  name,
+  description,
+  supercategoryid,
+  orderid,
+  userid,
+  id
+) => {
   const query =
-    "UPDATE mastercategory SET name=?,description=?, modifiedby=? where id=?";
+    "UPDATE mastercategory SET name=?,description=?,supercategoryid=?,orderid=?, modifiedby=? where id=?";
   const client = await pool.getConnection();
   try {
-    const result = await client.query(query, [name, description, userid, id]);
+    const result = await client.query(query, [
+      name,
+      description,
+      supercategoryid,
+      orderid,
+      userid,
+      id,
+    ]);
     client.release();
     return result;
   } catch (error) {
@@ -101,17 +117,27 @@ const mcAll = async () => {
  * This method for create mastercategory.
  * @param {string} name mastercategory name
  * @param {string} description mastercategory description
+ * @param {number} supercategoryid super category id
+ * @param {number} orderid order id
  * @param {string} userid user ID
  * @returns {result} result
  */
-const mcCreate = async (name, description, userid) => {
+const mcCreate = async (
+  name,
+  description,
+  orderid,
+  supercategoryid,
+  userid
+) => {
   const query =
-    "INSERT INTO mastercategory (name, description, createdby, modifiedby) VALUES(?,?,?,?)";
+    "INSERT INTO mastercategory (name, description, supercategoryid,orderid, createdby, modifiedby) VALUES(?,?,?,?,?,?)";
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
       name,
       description,
+      supercategoryid,
+      orderid,
       userid,
       userid,
     ]);

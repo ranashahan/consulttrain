@@ -6,6 +6,13 @@ const {
   cacheMiddleware,
 } = require("../middleware/auth");
 const {
+  deleteSuperCategory,
+  updateSuperCategory,
+  getSuperCategory,
+  getSuperCategorys,
+  createSuperCategory,
+} = require("../controllers/supercategoryController");
+const {
   deleteMasterCategory,
   updateMasterCategory,
   getMasterCategory,
@@ -135,5 +142,42 @@ router
     ensureAuthenticated,
     roleAuthorize(constants.MANAGERS),
     deleteSlaveCategory
+  );
+
+/**
+ * This is super categories routes
+ */
+router
+  .route("/super/create")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    createSuperCategory
+  );
+router
+  .route("/super/getAll")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getSuperCategorys
+  );
+router
+  .route("/super/:id")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLROLES),
+    getSuperCategory
+  )
+  .put(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    updateSuperCategory
+  )
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    deleteSuperCategory
   );
 module.exports = router;

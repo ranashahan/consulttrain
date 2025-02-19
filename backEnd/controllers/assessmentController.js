@@ -10,6 +10,7 @@ const { constants } = require("../constants");
 const createAssessment = asyncHandler(async (req, res) => {
   try {
     const {
+      formid,
       sessionName,
       sessionDate,
       locationId,
@@ -51,6 +52,7 @@ const createAssessment = asyncHandler(async (req, res) => {
     }
 
     const newAssessment = await db.insertAssessment(
+      formid,
       sessionName,
       sessionDate,
       locationId,
@@ -183,16 +185,27 @@ const deleteSessionTraining = asyncHandler(async (req, res) => {
  */
 const getAssessments = asyncHandler(async (req, res) => {
   try {
-    const results = await db.assessmentAllExp();
+    const results = await db.assessmentAll();
     const categories = results.reduce((acc, row) => {
-      let masterCategory = acc.find((mc) => mc.id === row.mastercategory_id);
+      let superCategory = acc.find((sp) => sp.id === row.supercategory_id);
+      if (!superCategory) {
+        superCategory = {
+          id: row.supercategory_id,
+          name: row.supercategory_name,
+          mastercategories: [],
+        };
+        acc.push(superCategory);
+      }
+      let masterCategory = superCategory.mastercategories.find(
+        (mc) => mc.id === row.mastercategory_id
+      );
       if (!masterCategory) {
         masterCategory = {
           id: row.mastercategory_id,
           name: row.mastercategory_name,
           slavecategories: [],
         };
-        acc.push(masterCategory);
+        superCategory.mastercategories.push(masterCategory);
       }
 
       let slaveCategory = masterCategory.slavecategories.find(

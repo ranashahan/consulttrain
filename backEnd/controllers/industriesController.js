@@ -1,33 +1,33 @@
 const asyncHandler = require("express-async-handler");
-const db = require("../dataBase/visualQ");
+const db = require("../dataBase/industriesQ");
 const { constants } = require("../constants");
 /**
- * @description Create a visual
- * @route POST /api/visual/create
+ * @description Create a industries
+ * @route POST /api/industries/create
  * @access private
  */
-const createVisual = asyncHandler(async (req, res) => {
+const createIndustries = asyncHandler(async (req, res) => {
   try {
     const { name, description, userid } = req.body;
 
     if (!name || !userid) {
       return res.status(constants.UNPROCESSABLE).json({
-        message: "Please fill in all fields (visual name and userid)",
+        message: "Please fill in all fields (industry name and userid)",
       });
     }
-    const [visual] = await db.visualFind(name);
-    if (visual) {
+    const [industries] = await db.industriesFind(name);
+    if (industries) {
       return res
         .status(constants.CONFLICT)
-        .json({ message: name + " visual already exists" });
+        .json({ message: name + " industry already exists" });
     }
 
-    const newvisual = await db.visualCreate(name, description, userid);
-    const visualid = JSON.stringify(newvisual[0]);
+    const newindustries = await db.industriesCreate(name, description, userid);
+    const industriesid = JSON.stringify(newindustries[0]);
 
     return res.status(constants.SUCCESS).json({
-      message: `visual created successfully with ID: ${
-        JSON.parse(visualid).insertId
+      message: `industries created successfully with ID: ${
+        JSON.parse(industriesid).insertId
       }`,
     });
   } catch (error) {
@@ -36,13 +36,13 @@ const createVisual = asyncHandler(async (req, res) => {
 });
 
 /**
- * @description get all the visuals
- * @route GET /api/visual/getAll
+ * @description get all the industries
+ * @route GET /api/industries/getAll
  * @access private
  */
-const getVisuals = asyncHandler(async (req, res) => {
+const getIndustries = asyncHandler(async (req, res) => {
   try {
-    const result = await db.visualAll();
+    const result = await db.industriesAll();
     return res.status(constants.SUCCESS).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
@@ -50,11 +50,11 @@ const getVisuals = asyncHandler(async (req, res) => {
 });
 
 /**
- * @description get visual from ID
- * @route GET /api/visual/:id
+ * @description get industries from ID
+ * @route GET /api/industries/:id
  * @access private
  */
-const getVisual = asyncHandler(async (req, res) => {
+const getIndustry = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
@@ -62,7 +62,7 @@ const getVisual = asyncHandler(async (req, res) => {
         message: "Please provide param (id)",
       });
     }
-    const result = await db.visualFindByID(id);
+    const result = await db.industriesFindByID(id);
     if (!result.length > 0) {
       return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
@@ -75,11 +75,11 @@ const getVisual = asyncHandler(async (req, res) => {
 });
 
 /**
- * @description update visual against param id
- * @route PUT /api/visual/:id
+ * @description update industries against param id
+ * @route PUT /api/industries/:id
  * @access private
  */
-const updateVisual = asyncHandler(async (req, res) => {
+const updateIndustries = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     const { name, description, userid } = req.body;
@@ -88,13 +88,13 @@ const updateVisual = asyncHandler(async (req, res) => {
         message: "Please provide param (id)",
       });
     }
-    const visual = await db.visualFindByID(id);
-    if (visual.length < 1) {
+    const industries = await db.industriesFindByID(id);
+    if (industries.length < 1) {
       return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.visualUpdateByID(name, description, userid, id);
+    const result = await db.industriesUpdateByID(name, description, userid, id);
 
     return res.status(constants.CREATED).json(result);
   } catch (error) {
@@ -103,11 +103,11 @@ const updateVisual = asyncHandler(async (req, res) => {
 });
 
 /**
- * @description delete visual against param id
- * @route DELETE /api/visual/:id
+ * @description delete industries against param id
+ * @route DELETE /api/industries/:id
  * @access private
  */
-const deleteVisual = asyncHandler(async (req, res) => {
+const deleteIndustries = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
@@ -115,13 +115,13 @@ const deleteVisual = asyncHandler(async (req, res) => {
         message: "Please provide param (id)",
       });
     }
-    const visual = await db.visualFindByID(id);
-    if (visual.length < 1) {
+    const industries = await db.industriesFindByID(id);
+    if (industries.length < 1) {
       return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.visualDeleteByID(id);
+    const result = await db.industriesDeleteByID(id);
     return res.status(constants.CREATED).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
@@ -129,9 +129,9 @@ const deleteVisual = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  deleteVisual,
-  updateVisual,
-  getVisual,
-  getVisuals,
-  createVisual,
+  deleteIndustries,
+  updateIndustries,
+  getIndustry,
+  getIndustries,
+  createIndustries,
 };
