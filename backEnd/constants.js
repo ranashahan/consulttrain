@@ -7,6 +7,7 @@ exports.constants = {
   UNPROCESSABLE: 422,
   CREATED: 201,
   SUCCESS: 200,
+  NOCONTENT: 204,
   CONFLICT: 409,
   // TTL: 1000 * 60 * 60,
   TTL: 1000 * 60 * 5,

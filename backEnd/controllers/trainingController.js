@@ -329,6 +329,45 @@ const deleteTraining = asyncHandler(async (req, res) => {
   }
 });
 
+const getTrainingReportAll = asyncHandler(async (req, res) => {
+  try {
+    const results = await db.trainingReportAll(req);
+    if (!results.length > 0) {
+      return res.status(constants.NOCONTENT).json({
+        message: `Could not found any result`,
+      });
+    }
+
+    let dataFromDatabase = results;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.plandate) {
+        item.plandate = new Date(item.plandate).toLocaleDateString();
+      }
+      if (item.startdate) {
+        item.startdate = new Date(item.startdate).toLocaleDateString();
+      }
+      if (item.enddate) {
+        item.enddate = new Date(item.enddate).toLocaleDateString();
+      }
+      if (item.trainingexpiry) {
+        item.trainingexpiry = new Date(
+          item.trainingexpiry
+        ).toLocaleDateString();
+      }
+      if (item.invoicedate) {
+        item.invoicedate = new Date(item.invoicedate).toLocaleDateString();
+      }
+      return item;
+    });
+    return res.status(constants.SUCCESS).json(formattedResponse);
+    // setTimeout(() => {
+    //   return res.status(constants.SUCCESS).json(formattedResponse);
+    // }, 2000);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
 module.exports = {
   deleteTraining,
   updateTraining,
@@ -336,4 +375,5 @@ module.exports = {
   getTrainings,
   createTraining,
   getTrainingByDate,
+  getTrainingReportAll,
 };

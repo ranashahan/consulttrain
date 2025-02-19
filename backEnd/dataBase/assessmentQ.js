@@ -175,6 +175,7 @@ const sessionReportAll = async (req) => {
 	,s.comment AS sessioncomment
 	,c.id AS sessioncontractorid
 	,t.id AS trainerid
+  ,s.formid
 FROM session s
 JOIN session_driver sd ON sd.session_id = s.id
 LEFT JOIN driver d ON d.id = sd.driver_id

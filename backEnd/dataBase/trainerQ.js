@@ -99,11 +99,11 @@ const trainerUpdateByID = async (
  * @param {string} id trainerid
  * @returns {result} result
  */
-const trainerDeleteByID = async (id) => {
-  const query = "DELETE FROM trainer where id=?";
+const trainerDeleteByID = async (userid, id) => {
+  const query = "UPDATE trainer SET active=0, modifiedby=? where id=?";
   const client = await pool.getConnection();
   try {
-    const result = await client.query(query, [id]);
+    const result = await client.query(query, [userid, id]);
     client.release();
     return result;
   } catch (error) {

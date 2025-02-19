@@ -399,6 +399,92 @@ requestedby,contactnumber,source,venue,locationid,status,classroom,assessment,co
   }
 };
 
+/**
+ * This method will generate data for export report
+ * @param {request} req
+ * @returns {result} result
+ */
+const trainingReportAll = async (req) => {
+  const client = await pool.getConnection();
+  try {
+    const {
+      name,
+      courseid,
+      categoryid,
+      clientid,
+      contractorid,
+      titleid,
+      trainerid,
+      locationid,
+      source,
+      status,
+      startDate,
+      endDate,
+    } = req.query;
+    let query = `select t.id,t.name,t.courseid,t.categoryid,t.plandate,t.startdate,t.enddate,t.duration,
+                  t.titleid,t.clientid,t.contractorid,t.trainerid,t.trainingexpiry,t.invoicenumber,t.invoicedate,
+                  t.charges,t.transportation,t.miscexpense,t.tax,t.total,t.amountreceived,t.bank,t.cheque,
+                  t.requestedby, t.contactnumber,t.source,t.venue,t.locationid,t.status,
+                  (select count(session_id) from training_session where training_id  = t.id) as sessioncount,
+                  i.id as industriesid,p.username as createdby FROM training t 
+                  LEFT JOIN users p on p.userid = t.createdby 
+                  LEFT JOIN contractor c on c.id = t.contractorid
+                  LEFT JOIN industries i on i.id = c.industriesid`;
+    const conditions = [];
+    if (courseid) {
+      conditions.push(`t.courseid = '${courseid}'`);
+    }
+    if (categoryid) {
+      conditions.push(`t.categoryid = '${categoryid}'`);
+    }
+    if (clientid) {
+      conditions.push(`t.clientid = '${clientid}'`);
+    }
+    if (contractorid) {
+      conditions.push(`t.contractorid = '${contractorid}'`);
+    }
+    if (name) {
+      conditions.push(`t.name LIKE '%${name}%'`);
+    }
+    if (locationid) {
+      conditions.push(`t.locationid = '${locationid}'`);
+    }
+    if (titleid) {
+      conditions.push(`t.titleid = '${titleid}'`);
+    }
+    if (source) {
+      conditions.push(`t.source = '${source}'`);
+    }
+    if (status) {
+      conditions.push(`t.status = '${status}'`);
+    }
+    if (trainerid) {
+      conditions.push(`t.trainerid = '${trainerid}'`);
+    }
+    if (startDate) {
+      conditions.push(
+        `DATE(t.created_at) BETWEEN '${startDate}' AND '${endDate}' `
+      );
+    }
+    if (conditions.length > 0) {
+      query +=
+        " WHERE " +
+        conditions.join(" AND ") +
+        "and t.active = 1  order by t.plandate asc ";
+    }
+
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error(
+      "error occurred while training All Time Frame search: " + error
+    );
+    return error;
+  }
+};
+
 module.exports = {
   trainingCreate,
   trainingAll,
@@ -408,4 +494,5 @@ module.exports = {
   trainingID,
   trainingFind,
   trainingAllTimeFrame,
+  trainingReportAll,
 };
