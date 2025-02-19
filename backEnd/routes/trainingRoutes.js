@@ -12,6 +12,7 @@ const {
   updateTraining,
   deleteTraining,
   getTrainingByDate,
+  getTrainingReportAll,
 } = require("../controllers/trainingController");
 const { constants } = require("../constants");
 
@@ -33,7 +34,13 @@ router
     roleAuthorize(constants.MANAGERS),
     getTrainingByDate
   );
-
+router
+  .route("/getReportAll")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.ALLSTAFF),
+    getTrainingReportAll
+  );
 router
   .route("/:id")
   .get(ensureAuthenticated, roleAuthorize(constants.MANAGERS), getTraining)

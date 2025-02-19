@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/trainerQ");
-
+const { constants } = require("../constants");
 /**
  * @description Create a trainer
  * @route POST /api/trainer/create
@@ -11,20 +11,20 @@ const createTrainer = asyncHandler(async (req, res) => {
     const { name, initials, mobile, address, userid } = req.body;
 
     if (!name || !initials || !userid) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please fill in all fields (name, intials and userid)",
       });
     }
     const [trainerid] = await db.trainerFind(name);
     if (trainerid) {
       return res
-        .status(409)
+        .status(constants.CONFLICT)
         .json({ message: name + " trainer already exists" });
     }
     const [trainerInitials] = await db.trainerinitialsFind(initials);
     if (trainerInitials) {
       return res
-        .status(409)
+        .status(constants.CONFLICT)
         .json({ message: initials + " trainer already exists" });
     }
 
@@ -37,13 +37,13 @@ const createTrainer = asyncHandler(async (req, res) => {
     );
     const trainerID = JSON.stringify(newtrainer[0]);
 
-    return res.status(201).json({
+    return res.status(constants.SUCCESS).json({
       message: `trainer created successfully with trainerID: ${
         JSON.parse(trainerID).insertId
       }`,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 
@@ -55,9 +55,9 @@ const createTrainer = asyncHandler(async (req, res) => {
 const getTrainers = asyncHandler(async (req, res) => {
   try {
     const result = await db.trainerAll();
-    return res.status(200).json(result);
+    return res.status(constants.SUCCESS).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -70,19 +70,19 @@ const getTrainer = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const result = await db.trainerFindByID(id);
     if (!result.length > 0) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    return res.status(200).json(result);
+    return res.status(constants.SUCCESS).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -96,13 +96,13 @@ const updateTrainer = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const { name, initials, mobile, address, userid } = req.body;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const trainer = await db.trainerFindByID(id);
     if (trainer.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
@@ -115,9 +115,9 @@ const updateTrainer = asyncHandler(async (req, res) => {
       id
     );
 
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 /**
@@ -128,21 +128,22 @@ const updateTrainer = asyncHandler(async (req, res) => {
 const deleteTrainer = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
+    const { userid } = req.body;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const trainer = await db.trainerFindByID(id);
     if (trainer.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    const result = await db.trainerDeleteByID(id);
-    return res.status(201).json(result);
+    const result = await db.trainerDeleteByID(userid, id);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 

@@ -45,9 +45,5 @@ router
     getTrainer
   )
   .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updateTrainer)
-  .delete(
-    ensureAuthenticated,
-    roleAuthorize(constants.MANAGERS),
-    deleteTrainer
-  );
+  .post(ensureAuthenticated, roleAuthorize(constants.MANAGERS), deleteTrainer);
 module.exports = router;
