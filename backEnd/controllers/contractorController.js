@@ -4,7 +4,7 @@ const { constants } = require("../constants");
 
 /**
  * @description Create a Contractor
- * @route POST /api/contractor/create
+ * @route POST /api/sponsor/contractor/create
  * @access private
  */
 const createContractor = asyncHandler(async (req, res) => {
@@ -20,6 +20,7 @@ const createContractor = asyncHandler(async (req, res) => {
       address,
       initials,
       clientid,
+      industriesid,
     } = req.body.obj;
     const { userid } = req.body;
 
@@ -47,6 +48,7 @@ const createContractor = asyncHandler(async (req, res) => {
       address,
       initials,
       clientid,
+      industriesid,
       userid
     );
     const contractorID = JSON.stringify(newContractor[0]);
@@ -63,7 +65,7 @@ const createContractor = asyncHandler(async (req, res) => {
 
 /**
  * @description get all the Contractors
- * @route GET /api/contractor/getAll
+ * @route GET /api/sponsor/contractor/getAll
  * @access private
  */
 const getContractors = asyncHandler(async (req, res) => {
@@ -77,7 +79,7 @@ const getContractors = asyncHandler(async (req, res) => {
 
 /**
  * @description get Contractor from ID
- * @route GET /api/contractor/:id
+ * @route GET /api/sponsor/contractor/:id
  * @access private
  */
 const getContractor = asyncHandler(async (req, res) => {
@@ -102,7 +104,7 @@ const getContractor = asyncHandler(async (req, res) => {
 
 /**
  * @description update contractor against param id
- * @route PUT /api/contractor/:id
+ * @route PUT /api/sponsor/contractor/:id
  * @access private
  */
 const updateContractor = asyncHandler(async (req, res) => {
@@ -119,6 +121,7 @@ const updateContractor = asyncHandler(async (req, res) => {
       address,
       initials,
       clientid,
+      industriesid,
       userid,
     } = req.body;
     if (!id) {
@@ -144,6 +147,7 @@ const updateContractor = asyncHandler(async (req, res) => {
       address,
       initials,
       clientid,
+      industriesid,
       userid,
       id
     );
@@ -155,7 +159,7 @@ const updateContractor = asyncHandler(async (req, res) => {
 });
 /**
  * @description delete contractor against param id
- * @route DELETE /api/contractor/:id
+ * @route DELETE /api/sponsor/contractor/:id
  * @access private
  */
 const deleteContractor = asyncHandler(async (req, res) => {

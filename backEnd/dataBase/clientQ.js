@@ -61,11 +61,12 @@ const clientUpdateByID = async (
   website,
   agentname,
   agentnumber,
+  industriesid,
   userid,
   id
 ) => {
-  const query =
-    "UPDATE client SET name=?,description=?, contactperson=?, contactnumber=?,address=?,website=?,agentname=?,agentnumber=?, modifiedby=? where id=?";
+  const query = `UPDATE client SET name=?,description=?, contactperson=?, contactnumber=?,
+    address=?,website=?,agentname=?,agentnumber=?,industriesid=?, modifiedby=? where id=?`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -77,6 +78,7 @@ const clientUpdateByID = async (
       website,
       agentname,
       agentnumber,
+      industriesid,
       userid,
       id,
     ]);
@@ -147,10 +149,12 @@ const clientCreate = async (
   website,
   agentname,
   agentnumber,
+  industriesid,
   userid
 ) => {
-  const query = `INSERT INTO client (name, description, contactperson, contactnumber, address, website, agentname, agentnumber, createdby, modifiedby)
-     VALUES(?,?,?,?,?,?,?,?,?,?)`;
+  const query = `INSERT INTO client (name, description, contactperson, contactnumber, address, 
+  website, agentname, agentnumber, industriesid, createdby, modifiedby)
+     VALUES(?,?,?,?,?,?,?,?,?,?,?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -162,6 +166,7 @@ const clientCreate = async (
       website,
       agentname,
       agentnumber,
+      industriesid,
       userid,
       userid,
     ]);

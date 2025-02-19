@@ -57,36 +57,37 @@ if (process.env.NODE_ENV === "production") {
   // );
 }
 
-app.use(
-  helmet({
-    contentSecurityPolicy: false,
-    crossOriginOpenerPolicy: "same-origin-allow-popups",
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          "'unsafe-eval'",
-          "https://www.google.com",
-          "https://www.gstatic.com",
-        ], // Allow inline scripts
-        scriptSrcAttr: ["'unsafe-inline'"],
-        connectSrc: [
-          "'self'",
-          `https://${process.env.URL}:${port}/`,
-          `http://${process.env.URL}:${port}/`,
-        ], // Allow API connection
-        imgSrc: ["'self'", "data:"],
-        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
-        // fontSrc: ["'self'", "https://fonts.googleapis.com"],
-        objectSrc: ["'none'"],
-        frameSrc: ["'self'", "https://www.google.com"],
-        upgradeInsecureRequests: [],
-      },
-    },
-  })
-);
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: false,
+//     crossOriginOpenerPolicy: "same-origin-allow-popups",
+//     contentSecurityPolicy: {
+//       directives: {
+//         defaultSrc: ["'self'"],
+//         scriptSrc: [
+//           "'self'",
+//           "'unsafe-inline'",
+//           "'unsafe-eval'",
+//           "https://www.google.com",
+//           "https://www.gstatic.com",
+//           `http://${process.env.URL}:${port}/`,
+//         ], // Allow inline scripts
+//         scriptSrcAttr: ["'unsafe-inline'"],
+//         connectSrc: [
+//           "'self'",
+//           `https://${process.env.URL}:${port}/`,
+//           `http://${process.env.URL}:${port}/`,
+//         ], // Allow API connection
+//         imgSrc: ["'self'", "data:"],
+//         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+//         // fontSrc: ["'self'", "https://fonts.googleapis.com"],
+//         objectSrc: ["'none'"],
+//         frameSrc: ["'self'", "https://www.google.com"],
+//         upgradeInsecureRequests: [],
+//       },
+//     },
+//   })
+// );
 
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/category", require("./routes/categoryRoutes.js"));
@@ -94,7 +95,7 @@ app.use("/api/course", require("./routes/courseRoutes.js"));
 app.use("/api/bloodgroup", require("./routes/bgRoutes.js"));
 app.use("/api/trainer", require("./routes/trainerRoutes.js"));
 app.use("/api/dltype", require("./routes/licensetypeRoutes.js"));
-app.use("/api/contractor", require("./routes/contractorRoutes.js"));
+app.use("/api/sponsor", require("./routes/sponsorRoutes.js"));
 app.use("/api/location", require("./routes/locationRoutes.js"));
 app.use("/api/result", require("./routes/resultRoutes.js"));
 app.use("/api/stage", require("./routes/stageRoutes.js"));
@@ -103,7 +104,6 @@ app.use("/api/training", require("./routes/trainingRoutes.js"));
 app.use("/api/vehicle", require("./routes/vehicleRoutes.js"));
 app.use("/api/visual", require("./routes/visualRoutes.js"));
 app.use("/api/driver", require("./routes/driverRoutes.js"));
-app.use("/api/client", require("./routes/clientRoutes.js"));
 app.use("/api/activity", require("./routes/activityRoutes.js"));
 app.use("/api/assessment", require("./routes/assessmentRoutes.js"));
 // Serve the Angular app's static files from the dist folder
