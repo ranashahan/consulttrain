@@ -59,6 +59,24 @@ const userFindByID = async (id) => {
     return error;
   }
 };
+/**
+ * This method use to fetch user by ID
+ * @param {string} id user param id
+ * @returns {result} result
+ */
+const userPassFindByID = async (id) => {
+  const query = `select password from users where userid=? and active = 1`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [id]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while userpass find by id: " + error);
+    return error;
+  }
+};
 
 /**
  * This method will update user via userid
@@ -286,4 +304,5 @@ module.exports = {
   deleteRefreshToken,
   findbyUsername,
   userUpdatePasswordByID,
+  userPassFindByID,
 };
