@@ -324,26 +324,30 @@ const resetUserPassword = asyncHandler(async (req, res) => {
       });
     }
 
-    const user = await db.userFindByID(id);
-    if (user.length < 1) {
+    const [user] = await db.userFindByID(id);
+    if (!user) {
       return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
 
-    const currentUserid = user[0].userid;
+    const currentUserid = user.userid;
+
     if (id != currentUserid) {
       res.status(constants.FORBIDDIN).json({
         message: `Provided (id ${id}) and database id does not match`,
       });
     }
-    const passwordMatch = await bcrypt.compare(oldpassword, user[0].password);
+    const [password] = await db.userPassFindByID(id);
+
+    const passwordMatch = await bcrypt.compare(oldpassword, password.password);
     if (!passwordMatch) {
-      return res.status(constants.UNPROCESSABLE).json({
+      return res.status(constants.CONFLICT).json({
         message:
           "Current Password did not match, please insert correct password",
       });
     }
+
     const hashedPassword = await bcrypt.hash(newpassword, 10);
 
     const result = await db.userUpdatePasswordByID(hashedPassword, userid, id);
