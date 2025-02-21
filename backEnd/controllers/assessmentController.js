@@ -24,6 +24,7 @@ const createAssessment = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
+      riskrating,
       quizscore,
       comment,
       trainerid,
@@ -66,6 +67,7 @@ const createAssessment = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
+      riskrating,
       quizscore,
       comment,
       userid,
@@ -267,7 +269,7 @@ const getSessionReportByDate = asyncHandler(async (req, res) => {
   try {
     const results = await db.sessionReportTimeFrame(req);
     if (!results.length > 0) {
-      return res.status(204).json({
+      return res.status(constants.NOCONTENT).json({
         message: `Could not found any result`,
       });
     }
@@ -419,6 +421,7 @@ const updateSession = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
+      riskrating,
       quizscore,
       comment,
       assessmentData,
@@ -461,6 +464,7 @@ const updateSession = asyncHandler(async (req, res) => {
       weather,
       traffic,
       route,
+      riskrating,
       quizscore,
       comment,
       userid,

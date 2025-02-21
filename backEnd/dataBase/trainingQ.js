@@ -478,9 +478,59 @@ const trainingReportAll = async (req) => {
     return result[0];
   } catch (error) {
     client.release();
-    console.error(
-      "error occurred while training All Time Frame search: " + error
-    );
+    console.error("error occurred while training Report All: " + error);
+    return error;
+  }
+};
+
+/**
+ * This method will generate data for export report
+ * @param {request} req
+ * @returns {result} result
+ */
+const trainingFinanceReport = async (req) => {
+  const client = await pool.getConnection();
+  try {
+    const { month, year } = req.query;
+    let query = `SELECT YEAR(t.plandate) AS year
+	,MONTH(t.plandate) AS month
+	,t.plandate
+	,t.name
+	,t.clientid
+	,t.contractorid
+	,t.charges
+	,t.transportation
+	,t.miscexpense
+	,t.tax
+	,t.total
+	,t.amountreceived
+	,t.invoicenumber
+	,t.invoicedate
+	,t.bank
+	,t.cheque
+FROM training t `;
+    const conditions = [];
+    if (month) {
+      conditions.push(`MONTH(t.plandate) = ${month}`);
+    }
+    if (year) {
+      conditions.push(`YEAR(t.plandate) = ${year}`);
+    }
+    if (conditions.length > 0) {
+      query +=
+        " WHERE " +
+        conditions.join(" AND ") +
+        " AND t.active = 1 ORDER BY MONTH(plandate); ";
+    } else {
+      client.release();
+      return Error("Cannot divide by zero");
+    }
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while training Finance Report: " + error);
     return error;
   }
 };
@@ -495,4 +545,5 @@ module.exports = {
   trainingFind,
   trainingAllTimeFrame,
   trainingReportAll,
+  trainingFinanceReport,
 };

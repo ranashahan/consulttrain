@@ -13,6 +13,7 @@ const {
   deleteTraining,
   getTrainingByDate,
   getTrainingReportAll,
+  getTrainingFinanceReport,
 } = require("../controllers/trainingController");
 const { constants } = require("../constants");
 
@@ -38,8 +39,15 @@ router
   .route("/getReportAll")
   .get(
     ensureAuthenticated,
-    roleAuthorize(constants.ALLSTAFF),
+    roleAuthorize(constants.MANAGERS),
     getTrainingReportAll
+  );
+router
+  .route("/getFinanceReport")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.MANAGERS),
+    getTrainingFinanceReport
   );
 router
   .route("/:id")
