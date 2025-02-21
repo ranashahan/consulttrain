@@ -171,6 +171,7 @@ const sessionReportAll = async (req) => {
 	,s.weather
 	,s.traffic
 	,s.route
+  ,s.riskrating
 	,s.quizscore
 	,s.comment AS sessioncomment
 	,c.id AS sessioncontractorid
@@ -340,6 +341,7 @@ ORDER BY
  * @param {string} weather
  * @param {string} traffic
  * @param {string} route
+ * @param {string} riskrating
  * @param {number} createdUserId
  * @param {number} driverId
  * @param {Sting} trainerIds
@@ -361,6 +363,7 @@ const insertAssessment = async (
   weather,
   traffic,
   route,
+  riskrating,
   quizscore,
   comment,
   createdUserId,
@@ -384,6 +387,7 @@ const insertAssessment = async (
     weather,
     traffic,
     route,
+    riskrating,
     quizscore,
     comment,
     createdUserId,
@@ -392,7 +396,7 @@ const insertAssessment = async (
     contractorid,
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
-  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `CALL insert_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, params);
@@ -506,6 +510,7 @@ const sessionUpdateByID = async (
   weather,
   traffic,
   route,
+  riskrating,
   quizscore,
   comment,
   userid,
@@ -525,12 +530,13 @@ const sessionUpdateByID = async (
     weather,
     traffic,
     route,
+    riskrating,
     quizscore,
     comment,
     userid,
     JSON.stringify(assessmentData), // Convert assessmentData to JSON string
   ];
-  const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `CALL update_session_data(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, params);

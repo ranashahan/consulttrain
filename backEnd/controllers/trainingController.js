@@ -329,6 +329,11 @@ const deleteTraining = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @description get training report all
+ * @route GET /api/training/getReportAll
+ * @access private
+ */
 const getTrainingReportAll = asyncHandler(async (req, res) => {
   try {
     const results = await db.trainingReportAll(req);
@@ -360,9 +365,36 @@ const getTrainingReportAll = asyncHandler(async (req, res) => {
       return item;
     });
     return res.status(constants.SUCCESS).json(formattedResponse);
-    // setTimeout(() => {
-    //   return res.status(constants.SUCCESS).json(formattedResponse);
-    // }, 2000);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
+ * @description get training finance report all
+ * @route GET /api/training/getFinanceReport
+ * @access private
+ */
+const getTrainingFinanceReport = asyncHandler(async (req, res) => {
+  try {
+    const results = await db.trainingFinanceReport(req);
+    if (!results.length > 0) {
+      return res.status(constants.NOCONTENT).json({
+        message: `Could not found any result`,
+      });
+    }
+
+    let dataFromDatabase = results;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.plandate) {
+        item.plandate = new Date(item.plandate).toLocaleDateString();
+      }
+      if (item.invoicedate) {
+        item.invoicedate = new Date(item.invoicedate).toLocaleDateString();
+      }
+      return item;
+    });
+    return res.status(constants.SUCCESS).json(formattedResponse);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -376,4 +408,5 @@ module.exports = {
   createTraining,
   getTrainingByDate,
   getTrainingReportAll,
+  getTrainingFinanceReport,
 };
