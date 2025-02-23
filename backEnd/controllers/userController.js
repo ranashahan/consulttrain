@@ -90,7 +90,7 @@ const loginUser = asyncHandler(async (req, res) => {
       );
 
       if (!verificationResult.success) {
-        return res.status(401).json(verificationResult);
+        return res.status(constants.UNAUTHORIZED).json(verificationResult);
       }
     }
 
