@@ -25,34 +25,38 @@ router
   .get(
     ensureAuthenticated,
     cacheMiddleware,
-    roleAuthorize(constants.MANAGERS),
+    roleAuthorize(constants.BILLMANAGERS),
     getTrainings
   );
 router
   .route("/getbydate")
   .get(
     ensureAuthenticated,
-    roleAuthorize(constants.MANAGERS),
+    roleAuthorize(constants.BILLMANAGERS),
     getTrainingByDate
   );
 router
   .route("/getReportAll")
   .get(
     ensureAuthenticated,
-    roleAuthorize(constants.MANAGERS),
+    roleAuthorize(constants.BILLMANAGERS),
     getTrainingReportAll
   );
 router
   .route("/getFinanceReport")
   .get(
     ensureAuthenticated,
-    roleAuthorize(constants.MANAGERS),
+    roleAuthorize(constants.BILLMANAGERS),
     getTrainingFinanceReport
   );
 router
   .route("/:id")
-  .get(ensureAuthenticated, roleAuthorize(constants.MANAGERS), getTraining)
-  .put(ensureAuthenticated, roleAuthorize(constants.MANAGERS), updateTraining)
+  .get(ensureAuthenticated, roleAuthorize(constants.BILLMANAGERS), getTraining)
+  .put(
+    ensureAuthenticated,
+    roleAuthorize(constants.BILLMANAGERS),
+    updateTraining
+  )
   .delete(
     ensureAuthenticated,
     roleAuthorize(constants.MANAGERS),

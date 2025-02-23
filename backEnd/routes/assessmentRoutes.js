@@ -31,12 +31,30 @@ router
   .route("/createst")
   .post(
     ensureAuthenticated,
-    roleAuthorize(constants.MANAGERS),
+    roleAuthorize(constants.BILLMANAGERS),
     createSessionTraining
   );
-router.route("/getbydate").get(ensureAuthenticated, getSessionByDate);
-router.route("/getst").get(ensureAuthenticated, getSessionTraining);
-router.route("/deletets").post(ensureAuthenticated, deleteSessionTraining);
+router
+  .route("/getbydate")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.ALLROLES),
+    getSessionByDate
+  );
+router
+  .route("/getst")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.BILLMANAGERS),
+    getSessionTraining
+  );
+router
+  .route("/deletets")
+  .post(
+    ensureAuthenticated,
+    roleAuthorize(constants.BILLMANAGERS),
+    deleteSessionTraining
+  );
 router
   .route("/getAll")
   .get(
