@@ -24,7 +24,7 @@ exports.constants = {
   //https://www.google.com/recaptcha/admin/site/715540799
   //ranashahan@gmail.com
   ALLROLES: ["admin", "manager", "staff", "member", "guest", "biller"],
-  ALLSTAFF: ["admin", "manager", "staff", "member"],
+  ALLSTAFF: ["admin", "biller", "manager", "staff", "member"],
   MANAGERS: ["admin", "manager"],
   BILLMANAGERS: ["admin", "manager", "biller"],
   BILLER: ["biller"],

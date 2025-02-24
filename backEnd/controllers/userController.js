@@ -207,13 +207,13 @@ const getUser = asyncHandler(async (req, res) => {
         message: "Please provide param (id)",
       });
     }
-    const result = await db.userFindByID(id);
+    const [result] = await db.userFindByID(id);
     if (result.length === 0) {
       return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    return res.status(200).json(result);
+    return res.status(constants.SUCCESS).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
