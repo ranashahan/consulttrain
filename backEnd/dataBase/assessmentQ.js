@@ -90,14 +90,14 @@ const sessionAllTimeFrame = async (req) => {
     }
     if (startDate) {
       conditions.push(
-        `DATE(s.created_at) BETWEEN '${startDate}' AND '${endDate}' `
+        `DATE(s.sessiondate) BETWEEN '${startDate}' AND '${endDate}' `
       );
     }
     if (conditions.length > 0) {
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        "and s.active=1 order by s.created_at desc limit 200";
+        "and s.active=1 order by s.sessiondate desc limit 200";
     }
 
     const result = await client.query(query);

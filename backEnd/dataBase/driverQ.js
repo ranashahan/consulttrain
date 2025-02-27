@@ -254,7 +254,7 @@ const driverUpdateByID = async (
     const result = await client.query(query, [
       name,
       gender,
-      dob,
+      dob || null,
       nic,
       nicexpiry || null,
       licensenumber,

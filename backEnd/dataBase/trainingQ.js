@@ -99,14 +99,14 @@ const trainingAllTimeFrame = async (req) => {
     }
     if (startDate) {
       conditions.push(
-        `DATE(created_at) BETWEEN '${startDate}' AND '${endDate}' `
+        `DATE(plandate) BETWEEN '${startDate}' AND '${endDate}' `
       );
     }
     if (conditions.length > 0) {
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        "and active=1 order by created_at desc limit 200";
+        "and active=1 order by plandate desc limit 200";
     }
     const result = await client.query(query);
     client.release();
