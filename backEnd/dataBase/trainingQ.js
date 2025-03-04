@@ -75,8 +75,9 @@ const trainingAllTimeFrame = async (req) => {
       endDate,
     } = req.query;
 
-    let query = `select id, name, courseid, categoryid, plandate, clientid, contractorid, trainerid, 
-    total, amountreceived, status, (select count(session_id) from training_session where training_id  = id) as sessioncount 
+    let query = `select id, name, plandate, enddate, courseid, categoryid,  clientid, contractorid, 
+    trainerid, total, amountreceived, status, (select count(session_id) from training_session 
+    where training_id  = id) as sessioncount 
     from training`;
     const conditions = [];
     if (name) {
