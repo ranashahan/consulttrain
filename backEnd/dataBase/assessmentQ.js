@@ -249,10 +249,13 @@ LEFT JOIN contractor c ON c.id = sc.contractor_id`;
 const sessionReportTimeFrame = async (req) => {
   const client = await pool.getConnection();
   try {
-    const { clientid, contractorid, startDate, endDate } = req.query;
+    const { name, clientid, contractorid, startDate, endDate } = req.query;
 
     let query = `SELECT * from vsession`;
     const conditions = [];
+    if (name) {
+      conditions.push(`name LIKE '%${name}%'`);
+    }
     if (clientid) {
       conditions.push(`clientid = '${clientid}'`);
     }
