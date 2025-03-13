@@ -297,6 +297,12 @@ const getSessionReportByDate = asyncHandler(async (req, res) => {
       if (item.dob) {
         item.dob = new Date(item.dob).toLocaleDateString();
       }
+      if (item.medicalexpiry) {
+        item.medicalexpiry = new Date(item.medicalexpiry).toLocaleDateString();
+      }
+      if (item.nicexpiry) {
+        item.nicexpiry = new Date(item.nicexpiry).toLocaleDateString();
+      }
       return item;
     });
     return res.status(constants.SUCCESS).json(formattedResponse);
