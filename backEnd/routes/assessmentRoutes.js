@@ -79,14 +79,7 @@ router
   );
 router
   .route("/:id")
-  .get(
-    ensureAuthenticated,
-    cacheMiddleware,
-    roleAuthorize(constants.ALLROLES),
-    getSession
-  );
-router
-  .route("/:id")
+  .get(ensureAuthenticated, roleAuthorize(constants.ALLROLES), getSession)
   .put(ensureAuthenticated, roleAuthorize(constants.ALLSTAFF), updateSession)
   .delete(
     ensureAuthenticated,
