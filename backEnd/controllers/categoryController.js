@@ -69,7 +69,7 @@ const getCategory = asyncHandler(async (req, res) => {
         message: `wrong param (id ${id}) provided`,
       });
     }
-    return res.status(constants.CREATED).json(result);
+    return res.status(constants.SUCCESS).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
