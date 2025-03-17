@@ -141,7 +141,7 @@ const updateClient = asyncHandler(async (req, res) => {
       id
     );
 
-    return res.status(constants.SUCCESS).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
