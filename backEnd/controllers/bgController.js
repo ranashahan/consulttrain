@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/bgQ");
-
+const { constants } = require("../constants");
 /**
  * @description Create a BloodGroup
  * @route POST /api/bloodgroup/create
@@ -11,25 +11,27 @@ const createBloodgroup = asyncHandler(async (req, res) => {
     const { name, description, userid } = req.body;
 
     if (!name || !userid) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please fill in all fields (bloodgroup and username)",
       });
     }
     const [bloodGroup] = await db.bgFind(name);
     if (bloodGroup) {
-      return res.status(409).json({ message: "Bloodgroup already exists" });
+      return res
+        .status(constants.CONFLICT)
+        .json({ message: "Bloodgroup already exists" });
     }
 
     const newBloodGroup = await db.bgCreate(name, description, userid);
     const bloodgroupID = JSON.stringify(newBloodGroup[0]);
 
-    return res.status(201).json({
+    return res.status(constants.CREATED).json({
       message: `BloodGroup created successfully with bloodgroupid: ${
         JSON.parse(bloodgroupID).insertId
       }`,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(constants.SERVER_ERROR).json({ message: error.message });
   }
 });
 
@@ -41,9 +43,9 @@ const createBloodgroup = asyncHandler(async (req, res) => {
 const getBloodgroups = asyncHandler(async (req, res) => {
   try {
     const result = await db.bgAll();
-    return res.status(200).json(result);
+    return res.status(constants.SUCCESS).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -56,19 +58,19 @@ const getBloodgroup = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const result = await db.bgFindByID(id);
     if (!result.length > 0) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
-    return res.status(200).json(result);
+    return res.status(constants.SUCCESS).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 
@@ -82,21 +84,21 @@ const updateBloodgroup = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const { name, description, userid } = req.body;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const bloodGroup = await db.bgFindByID(id);
     if (bloodGroup.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
     const result = await db.bgUpdateByID(name, description, userid, id);
 
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 /**
@@ -108,20 +110,20 @@ const deleteBloodgroup = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     if (!id) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
       });
     }
     const Bloodgroup = await db.bgFindByID(id);
     if (Bloodgroup.length < 1) {
-      return res.status(422).json({
+      return res.status(constants.UNPROCESSABLE).json({
         message: `wrong param (id ${id}) provided`,
       });
     }
     const result = await db.bgDeleteByID(id);
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
-    res.status(500);
+    res.status(constants.SERVER_ERROR);
   }
 });
 

@@ -243,6 +243,20 @@ const getAssessments = asyncHandler(async (req, res) => {
 
 /**
  * @description get all the assessments
+ * @route GET /api/assessment/getsAll
+ * @access private
+ */
+const getSessionsAll = asyncHandler(async (req, res) => {
+  try {
+    const result = await db.sessionAll();
+    return res.status(constants.SUCCESS).json(result);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
+ * @description get all the assessments
  * @route GET /api/assessment/getbydate
  * @access private
  */
@@ -520,4 +534,5 @@ module.exports = {
   deleteSessionTraining,
   getSessionReportByDate,
   getSessionReportAll,
+  getSessionsAll,
 };
