@@ -330,6 +330,24 @@ ORDER BY
 };
 
 /**
+ * This method for fetch all the sessions.
+ * @returns {result} result
+ */
+const sessionAll = async () => {
+  const query = "CALL `consulttrain`.`getAllSessions`();";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query);
+    client.release();
+    return result[0][0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while all sessions: " + error);
+    return error;
+  }
+};
+
+/**
  * This method for insert assessment form.
  * @param {string} sessionName
  * @param {Date} sessionDate
@@ -607,4 +625,5 @@ module.exports = {
   trainingSessionFind,
   sessionReportTimeFrame,
   sessionReportAll,
+  sessionAll,
 };
