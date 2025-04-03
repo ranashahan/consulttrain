@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/trainingQ");
 const asstdb = require("../dataBase/assessmentQ");
+const clientdb = require("../dataBase/clientQ");
 const { constants } = require("../constants");
 
 /**
@@ -135,6 +136,89 @@ const getTrainings = asyncHandler(async (req, res) => {
     });
 
     return res.status(constants.SUCCESS).json(formattedResponse);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
+ * @description get all the trainings
+ * @route GET /api/training/getAll
+ * @access private
+ */
+const getTrainingsCount = asyncHandler(async (req, res) => {
+  try {
+    const result = await db.trainingsCount();
+
+    return res.status(constants.SUCCESS).json(result);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
+ * @description get all the trainings yearly
+ * @route GET /api/assessment/getCountReportClients
+ * @access private
+ */
+const getTrainingCountReportClients = asyncHandler(async (req, res) => {
+  try {
+    const rows = await db.trainingCountReportClients();
+    if (!rows.length > 0) {
+      return res.status(constants.NOCONTENT).json({
+        message: `Could not found any result`,
+      });
+    }
+
+    const categoriesData = await clientdb.clientAll();
+
+    // Create a map of formId -> formName
+    const formNameMap = categoriesData.reduce((acc, row) => {
+      acc[row.id] = row.name; // { 16001: "UEP", 16002: "Shell", ... }
+      return acc;
+    }, {});
+
+    // Initialize categories (Months)
+    const categories = Array.from({ length: 12 }, (_, i) =>
+      new Date(0, i).toLocaleString("en", { month: "short" })
+    );
+
+    // Initialize data structure with 0 for all months
+    const groupedData = {};
+    let hasUnknownClient = false; // Flag to check if "Unknown" is needed
+
+    // Include a key for known clients
+    Object.keys(formNameMap).forEach((clientid) => {
+      groupedData[clientid] = Array(12).fill(0);
+    });
+
+    // Populate real data
+    rows.forEach((row) => {
+      let clientKey = row.clientid !== null ? row.clientid : "Unknown";
+
+      if (row.clientid === null) {
+        hasUnknownClient = true;
+      }
+
+      if (!groupedData[clientKey]) {
+        groupedData[clientKey] = Array(12).fill(0);
+      }
+
+      groupedData[clientKey][row.month - 1] = row.training_count;
+    });
+
+    // If there's no null clientid, remove "Unknown"
+    if (!hasUnknownClient) {
+      delete groupedData["Unknown"];
+    }
+
+    // Convert to ApexCharts series format
+    const series = Object.keys(groupedData).map((clientid) => ({
+      name: formNameMap[clientid] || "Unknown", // Use form name if available, else "Unknown"
+      data: groupedData[clientid],
+    }));
+
+    return res.status(constants.SUCCESS).json({ categories, series });
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -409,4 +493,6 @@ module.exports = {
   getTrainingByDate,
   getTrainingReportAll,
   getTrainingFinanceReport,
+  getTrainingsCount,
+  getTrainingCountReportClients,
 };

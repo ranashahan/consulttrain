@@ -39,6 +39,30 @@ const sessionTrainingFind = async (trainingId, sessionIds) => {
     return error;
   }
 };
+/**
+ * This method for fetch Session froms count
+ * @returns {result} result
+ */
+const sessionCountReportForms = async () => {
+  const query = `SELECT 
+        MONTH(s.sessiondate) AS month, 
+        s.formid,
+        COUNT(*) AS session_count
+    FROM session s
+    WHERE YEAR(s.sessiondate) = YEAR(CURDATE()) AND s.active = 1
+    GROUP BY month, s.formid
+    ORDER BY month, s.formid;`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while session count forms: " + error);
+    return error;
+  }
+};
 
 /**
  * This method for search query
@@ -626,4 +650,5 @@ module.exports = {
   sessionReportTimeFrame,
   sessionReportAll,
   sessionAll,
+  sessionCountReportForms,
 };
