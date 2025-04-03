@@ -18,6 +18,7 @@ const {
   getSessionReportByDate,
   getSessionReportAll,
   getSessionsAll,
+  getSessionCountReportForms,
 } = require("../controllers/assessmentController");
 const { constants } = require("../constants");
 
@@ -86,6 +87,14 @@ router
     ensureAuthenticated,
     roleAuthorize(constants.ALLSTAFF),
     getSessionReportAll
+  );
+router
+  .route("/getCountReportForms")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.ALLSTAFF),
+    getSessionCountReportForms
   );
 router
   .route("/:id")

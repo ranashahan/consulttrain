@@ -281,6 +281,49 @@ const trainingAll = async () => {
 };
 
 /**
+ * This method for fetch all the training count.
+ * @returns {result} result
+ */
+const trainingsCount = async () => {
+  const query = "select count(id) as totalTraining from training";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query);
+    client.release();
+    return result[0][0].totalTraining ?? 0;
+  } catch (error) {
+    client.release();
+    console.error("error occurred while all trainings: " + error);
+    return error;
+  }
+};
+
+/**
+ * This method for fetch Training clients count
+ * @returns {result} result
+ */
+const trainingCountReportClients = async () => {
+  const query = `SELECT 
+        MONTH(t.plandate) AS month, 
+        t.clientid,
+        COUNT(*) AS training_count
+    FROM training t
+    WHERE YEAR(t.plandate) = YEAR(CURDATE()) AND t.active = 1
+    GROUP BY month, t.clientid
+    ORDER BY month, t.clientid;`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while training count clients: " + error);
+    return error;
+  }
+};
+
+/**
  * This method for create training.
  * @param {string} name
  * @param {string} cource
@@ -547,4 +590,6 @@ module.exports = {
   trainingAllTimeFrame,
   trainingReportAll,
   trainingFinanceReport,
+  trainingsCount,
+  trainingCountReportClients,
 };

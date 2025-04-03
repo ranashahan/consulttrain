@@ -14,6 +14,8 @@ const {
   getTrainingByDate,
   getTrainingReportAll,
   getTrainingFinanceReport,
+  getTrainingsCount,
+  getTrainingCountReportClients,
 } = require("../controllers/trainingController");
 const { constants } = require("../constants");
 
@@ -27,6 +29,21 @@ router
     cacheMiddleware,
     roleAuthorize(constants.BILLMANAGERS),
     getTrainings
+  );
+router
+  .route("/getCount")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.BILLMANAGERS),
+    getTrainingsCount
+  );
+router
+  .route("/getCountReportClients")
+  .get(
+    ensureAuthenticated,
+    cacheMiddleware,
+    roleAuthorize(constants.BILLMANAGERS),
+    getTrainingCountReportClients
   );
 router
   .route("/getbydate")

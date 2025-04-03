@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../dataBase/assessmentQ");
+const dbsuper = require("../dataBase/supercategoryQ");
 const { constants } = require("../constants");
 
 /**
@@ -327,6 +328,56 @@ const getSessionReportByDate = asyncHandler(async (req, res) => {
     res.status(constants.SERVER_ERROR);
   }
 });
+
+/**
+ * @description get all the assessments
+ * @route GET /api/assessment/getCountReportForms
+ * @access private
+ */
+const getSessionCountReportForms = asyncHandler(async (req, res) => {
+  try {
+    const rows = await db.sessionCountReportForms();
+    if (!rows.length > 0) {
+      return res.status(constants.NOCONTENT).json({
+        message: `Could not found any result`,
+      });
+    }
+    const categoriesData = await dbsuper.spAll();
+
+    // Create a map of formId -> formName
+    const formNameMap = categoriesData.reduce((acc, row) => {
+      acc[row.id] = row.name; // { 16001: "UEP", 16002: "Shell", ... }
+      return acc;
+    }, {});
+
+    // Initialize categories (Months)
+    const categories = Array.from({ length: 12 }, (_, i) =>
+      new Date(0, i).toLocaleString("en", { month: "short" })
+    );
+
+    // Initialize data structure with 0 for all months
+    const groupedData = {};
+    Object.keys(formNameMap).forEach((formid) => {
+      groupedData[formid] = Array(12).fill(0);
+    });
+
+    // Populate real data
+    rows.forEach((row) => {
+      groupedData[row.formid][row.month - 1] = row.session_count;
+    });
+
+    // Convert to ApexCharts series format
+    const series = Object.keys(groupedData).map((formid) => ({
+      name: formNameMap[formid], // Use form name instead of ID
+      data: groupedData[formid],
+    }));
+
+    return res.status(constants.SUCCESS).json({ categories, series });
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
 /**
  * @description get all the driver + session data
  * @route GET /api/assessment/getReportAll
@@ -535,4 +586,5 @@ module.exports = {
   getSessionReportByDate,
   getSessionReportAll,
   getSessionsAll,
+  getSessionCountReportForms,
 };
