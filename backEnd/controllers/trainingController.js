@@ -34,6 +34,7 @@ const createTraining = asyncHandler(async (req, res) => {
       bank,
       cheque,
       amountreceived,
+      amountreceiveddate,
       requestedby,
       contactnumber,
       source,
@@ -46,10 +47,10 @@ const createTraining = asyncHandler(async (req, res) => {
       userid,
     } = req.body;
 
-    if (!name || !trainerid || !userid) {
+    if (!name || !plandate || !trainerid || !userid) {
       return res.status(constants.UNPROCESSABLE).json({
         message:
-          "Please fill in all fields (training name, trainerid and userid)",
+          "Please fill in all fields (training name, plandate, trainerid and userid)",
       });
     }
     const [trainingdup] = await db.trainingFind(name);
@@ -82,6 +83,7 @@ const createTraining = asyncHandler(async (req, res) => {
       bank,
       cheque,
       amountreceived,
+      amountreceiveddate,
       requestedby,
       contactnumber,
       source,
@@ -131,6 +133,11 @@ const getTrainings = asyncHandler(async (req, res) => {
       }
       if (item.invoicedate) {
         item.invoicedate = new Date(item.invoicedate).toLocaleDateString();
+      }
+      if (item.amountreceiveddate) {
+        item.amountreceiveddate = new Date(
+          item.amountreceiveddate
+        ).toLocaleDateString();
       }
       return item;
     });
@@ -277,9 +284,14 @@ const getTraining = asyncHandler(async (req, res) => {
       if (item.invoicedate) {
         item.invoicedate = new Date(item.invoicedate).toLocaleDateString();
       }
+      if (item.amountreceiveddate) {
+        item.amountreceiveddate = new Date(
+          item.amountreceiveddate
+        ).toLocaleDateString();
+      }
       return item;
     });
-    return res.status(200).json(formattedResponse);
+    return res.status(constants.SUCCESS).json(formattedResponse);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -316,6 +328,7 @@ const updateTraining = asyncHandler(async (req, res) => {
       bank,
       cheque,
       amountreceived,
+      amountreceiveddate,
       requestedby,
       contactnumber,
       source,
@@ -330,6 +343,11 @@ const updateTraining = asyncHandler(async (req, res) => {
     if (!id) {
       return res.status(constants.UNPROCESSABLE).json({
         message: "Please provide param (id)",
+      });
+    }
+    if (!plandate) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: "Please provide param (plandate)",
       });
     }
     const training = await db.trainingFindByID(id);
@@ -361,6 +379,7 @@ const updateTraining = asyncHandler(async (req, res) => {
       bank,
       cheque,
       amountreceived,
+      amountreceiveddate,
       requestedby,
       contactnumber,
       source,
@@ -374,7 +393,7 @@ const updateTraining = asyncHandler(async (req, res) => {
       id
     );
 
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -407,7 +426,7 @@ const deleteTraining = asyncHandler(async (req, res) => {
     }
 
     const result = await db.trainingDeleteByID(id);
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }
@@ -446,6 +465,11 @@ const getTrainingReportAll = asyncHandler(async (req, res) => {
       if (item.invoicedate) {
         item.invoicedate = new Date(item.invoicedate).toLocaleDateString();
       }
+      if (item.amountreceiveddate) {
+        item.amountreceiveddate = new Date(
+          item.amountreceiveddate
+        ).toLocaleDateString();
+      }
       return item;
     });
     return res.status(constants.SUCCESS).json(formattedResponse);
@@ -475,6 +499,11 @@ const getTrainingFinanceReport = asyncHandler(async (req, res) => {
       }
       if (item.invoicedate) {
         item.invoicedate = new Date(item.invoicedate).toLocaleDateString();
+      }
+      if (item.amountreceiveddate) {
+        item.amountreceiveddate = new Date(
+          item.amountreceiveddate
+        ).toLocaleDateString();
       }
       return item;
     });

@@ -145,6 +145,7 @@ const trainingAllTimeFrame = async (req) => {
  * @param {string} bank
  * @param {string} cheque
  * @param {number} amountreceived
+ * @param {Date} amountreceiveddate
  * @param {string} requestedby
  * @param {string} contactnumber
  * @param {string} source
@@ -181,6 +182,7 @@ const trainingUpdateByID = async (
   bank,
   cheque,
   amountreceived,
+  amountreceiveddate,
   requestedby,
   contactnumber,
   source,
@@ -195,7 +197,7 @@ const trainingUpdateByID = async (
 ) => {
   const query = `UPDATE training SET name=?, courseid=?, categoryid=?, plandate=?,  startdate=?, enddate=?, duration=?, titleid=?,
       clientid=?, contractorid=?, trainerid=?, trainingexpiry=?, invoicenumber=?, invoicedate=?, charges=?,
-      transportation=?, miscexpense=?, tax=?, total=?, bank=?, cheque=?, amountreceived=?, requestedby=?,
+      transportation=?, miscexpense=?, tax=?, total=?, bank=?, cheque=?, amountreceived=?, amountreceiveddate=?, requestedby=?,
       contactnumber=?, source=?, venue=?, locationid=?, status=?, classroom=?, assessment=?, commentry=?,
       modifiedby=? where id=?;`;
   const client = await pool.getConnection();
@@ -223,6 +225,7 @@ const trainingUpdateByID = async (
       bank,
       cheque,
       amountreceived,
+      amountreceiveddate || null,
       requestedby,
       contactnumber,
       source,
@@ -347,6 +350,7 @@ const trainingCountReportClients = async () => {
  * @param {string} bank
  * @param {string} cheque
  * @param {number} amountreceived
+ * @param {Date} amountreceiveddate
  * @param {string} requestedby
  * @param {string} contactnumber
  * @param {string} source
@@ -382,6 +386,7 @@ const trainingCreate = async (
   bank,
   cheque,
   amountreceived,
+  amountreceiveddate,
   requestedby,
   contactnumber,
   source,
@@ -394,9 +399,9 @@ const trainingCreate = async (
   userid
 ) => {
   const query = `INSERT INTO training (name,courseid,categoryid,plandate,startdate,enddate,duration,titleid,clientid,contractorid,trainerid,trainingexpiry,
-invoicenumber,invoicedate,charges,transportation,miscexpense,tax,total,bank,cheque,amountreceived,
+invoicenumber,invoicedate,charges,transportation,miscexpense,tax,total,bank,cheque,amountreceived,amountreceiveddate,
 requestedby,contactnumber,source,venue,locationid,status,classroom,assessment,commentry,createdby,modifiedby)
- VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [
@@ -422,6 +427,7 @@ requestedby,contactnumber,source,venue,locationid,status,classroom,assessment,co
       bank,
       cheque,
       amountreceived,
+      amountreceiveddate,
       requestedby,
       contactnumber,
       source,
@@ -467,8 +473,8 @@ const trainingReportAll = async (req) => {
     } = req.query;
     let query = `select t.id,t.name,t.courseid,t.categoryid,t.plandate,t.startdate,t.enddate,t.duration,
                   t.titleid,t.clientid,t.contractorid,t.trainerid,t.trainingexpiry,t.invoicenumber,t.invoicedate,
-                  t.charges,t.transportation,t.miscexpense,t.tax,t.total,t.amountreceived,t.bank,t.cheque,
-                  t.requestedby, t.contactnumber,t.source,t.venue,t.locationid,t.status,
+                  t.charges,t.transportation,t.miscexpense,t.tax,t.total,t.amountreceived,t.amountreceiveddate,
+                  t.bank,t.cheque,t.requestedby, t.contactnumber,t.source,t.venue,t.locationid,t.status,
                   (select count(session_id) from training_session where training_id  = t.id) as sessioncount,
                   i.id as industriesid,p.username as createdby FROM training t 
                   LEFT JOIN users p on p.userid = t.createdby 
@@ -507,7 +513,7 @@ const trainingReportAll = async (req) => {
     }
     if (startDate) {
       conditions.push(
-        `DATE(t.created_at) BETWEEN '${startDate}' AND '${endDate}' `
+        `DATE(t.plandate) BETWEEN '${startDate}' AND '${endDate}' `
       );
     }
     if (conditions.length > 0) {
@@ -548,6 +554,7 @@ const trainingFinanceReport = async (req) => {
 	,t.tax
 	,t.total
 	,t.amountreceived
+  ,t.amountreceiveddate
 	,t.invoicenumber
 	,t.invoicedate
 	,t.bank
