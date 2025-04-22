@@ -74,7 +74,7 @@ const driverSearch = async (req) => {
     }
     if (startDate) {
       conditions.push(
-        `DATE(created_at) BETWEEN '${startDate}' AND '${endDate}' `
+        `DATE(permitissue) BETWEEN '${startDate}' AND '${endDate}' `
       );
     }
 
@@ -82,7 +82,7 @@ const driverSearch = async (req) => {
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        " and active=1 order by created_at desc limit 200";
+        " and active=1 order by permitissue desc limit 200";
     }
     const result = await client.query(query);
     client.release();
