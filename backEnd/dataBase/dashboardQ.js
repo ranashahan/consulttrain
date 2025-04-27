@@ -44,12 +44,24 @@ const dashboardDriverSessionCount = async () => {
  * @returns {result} result
  */
 const dashboardTrainSessionCount = async () => {
-  const query = `CALL getdashboard_Trainer();`;
+  const query = `SELECT 
+        MONTH(s.sessiondate) AS month, 
+        t.name,
+        COUNT(s.id) AS session_count
+    FROM session s
+    JOIN session_trainer st on s.id = st.session_id
+    LEFT JOIN trainer t on t.id = st.trainer_id
+    WHERE YEAR(s.sessiondate) = YEAR(CURDATE()) 
+    AND s.active = 1
+    AND t.active = 1
+    GROUP BY month, t.name
+    ORDER BY month, t.name;
+`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
     client.release();
-    return result[0][0];
+    return result[0];
   } catch (error) {
     client.release();
     console.error(

@@ -23,9 +23,28 @@ exports.constants = {
   RECAPTCHA_SECRET_KEY: "6Lc_SaYqAAAAAPFQHhOX-vgIzxYvBsbsEL5dnK91",
   //https://www.google.com/recaptcha/admin/site/715540799
   //ranashahan@gmail.com
-  ALLROLES: ["admin", "manager", "staff", "member", "guest", "biller"],
-  ALLSTAFF: ["admin", "biller", "manager", "staff", "member"],
-  MANAGERS: ["admin", "manager"],
-  BILLMANAGERS: ["admin", "manager", "biller"],
+  ALLROLES: [
+    "admin",
+    "manager",
+    "staff",
+    "member",
+    "guest",
+    "biller",
+    "director",
+    "trainer",
+  ],
+  ALLSTAFF: [
+    "admin",
+    "biller",
+    "manager",
+    "staff",
+    "member",
+    "director",
+    "trainer",
+  ],
+  MANAGERS: ["admin", "manager", "director"],
+  BILLMANAGERS: ["admin", "manager", "biller", "director"],
   BILLER: ["biller"],
+  DIRECTOR: ["director"],
+  TRAINER: ["trainer"],
 };
