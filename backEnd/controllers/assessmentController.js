@@ -265,7 +265,7 @@ const getSessionByDate = asyncHandler(async (req, res) => {
   try {
     const results = await db.sessionAllTimeFrame(req);
     if (!results.length > 0) {
-      return res.status(204).json({
+      return res.status(constants.NOCONTENT).json({
         message: `Could not found any result`,
       });
     }

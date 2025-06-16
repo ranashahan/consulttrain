@@ -82,7 +82,7 @@ const driverSearch = async (req) => {
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        " and active=1 order by permitissue desc limit 200";
+        " and active=1 order by permitissue desc limit 400";
     }
     const result = await client.query(query);
     client.release();
