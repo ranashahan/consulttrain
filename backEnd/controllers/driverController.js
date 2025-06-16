@@ -35,7 +35,7 @@ const createDriver = asyncHandler(async (req, res) => {
       userid,
     } = req.body;
 
-    if (!name || !licensenumber || !nic || !userid) {
+    if (!name || !nic || !userid) {
       return res.status(constants.UNPROCESSABLE).json({
         message:
           "Please fill in all fields (driver name, license number, NIC and userid)",
@@ -48,13 +48,14 @@ const createDriver = asyncHandler(async (req, res) => {
         .json({ message: "NIC number already existed with " + nic });
     }
 
-    const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
-    if (driverLicenseNumber) {
-      return res.status(constants.CONFLICT).json({
-        message: "License number already existed with " + licensenumber,
-      });
+    if (licensenumber) {
+      const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
+      if (driverLicenseNumber) {
+        return res.status(constants.CONFLICT).json({
+          message: "License number already existed with " + licensenumber,
+        });
+      }
     }
-
     if (permitnumber) {
       const [driverPermitNumber] = await db.driverFindByPermit(permitnumber);
       if (driverPermitNumber) {
@@ -90,7 +91,7 @@ const createDriver = asyncHandler(async (req, res) => {
       userid
     );
 
-    return res.status(201).json({
+    return res.status(constants.CREATED).json({
       message: `Driver created successfully`,
     });
   } catch (error) {
@@ -274,7 +275,7 @@ const getDriverSearch = asyncHandler(async (req, res) => {
   try {
     const result = await db.driverSearch(req);
     if (!result.length > 0) {
-      return res.status(204).json({
+      return res.status(constants.NOCONTENT).json({
         message: `Could not found any result`,
       });
     }
@@ -362,10 +363,9 @@ const updateDriver = asyncHandler(async (req, res) => {
       });
     }
 
-    if (!name || !licensenumber || !nic || !userid) {
+    if (!name || !nic || !userid) {
       return res.status(constants.UNPROCESSABLE).json({
-        message:
-          "Please fill in all fields (driver name, license number, NIC and userid)",
+        message: "Please fill in all fields (driver name, NIC and userid)",
       });
     }
 
@@ -378,12 +378,14 @@ const updateDriver = asyncHandler(async (req, res) => {
       }
     }
 
-    const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
-    if (driverLicenseNumber) {
-      if (driverLicenseNumber.id != id) {
-        return res.status(constants.CONFLICT).json({
-          message: "License number already existed with " + licensenumber,
-        });
+    if (licensenumber) {
+      const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
+      if (driverLicenseNumber) {
+        if (driverLicenseNumber.id != id) {
+          return res.status(constants.CONFLICT).json({
+            message: "License number already existed with " + licensenumber,
+          });
+        }
       }
     }
 
@@ -425,7 +427,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       id
     );
 
-    return res.status(201).json(result);
+    return res.status(constants.CREATED).json(result);
   } catch (error) {
     res.status(constants.SERVER_ERROR);
   }

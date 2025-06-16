@@ -38,6 +38,26 @@ const trainingFindByID = async (id) => {
   }
 };
 /**
+ * This method use to fetch training by session ID
+ * @param {string} id session param id
+ * @returns {result} result
+ */
+const trainingFindBySessionID = async (id) => {
+  const query = `SELECT T.* FROM TRAINING T 
+  LEFT JOIN TRAINING_SESSION TS ON T.ID = TS.TRAINING_ID 
+  WHERE TS.SESSION_ID = ? AND T.ACTIVE=1;`;
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query, [id]);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error("error occurred while training find by session id: " + error);
+    return error;
+  }
+};
+/**
  * This method use to fetch training by ID
  * @param {string} id training param id
  * @returns {result} result
@@ -71,6 +91,8 @@ const trainingAllTimeFrame = async (req) => {
       categoryid,
       clientid,
       contractorid,
+      invoicenumber,
+      cheque,
       startDate,
       endDate,
     } = req.query;
@@ -98,6 +120,12 @@ const trainingAllTimeFrame = async (req) => {
     if (contractorid) {
       conditions.push(`contractorid = '${contractorid}'`);
     }
+    if (invoicenumber) {
+      conditions.push(`invoicenumber = '${invoicenumber}'`);
+    }
+    if (cheque) {
+      conditions.push(`cheque = '${cheque}'`);
+    }
     if (startDate) {
       conditions.push(
         `DATE(plandate) BETWEEN '${startDate}' AND '${endDate}' `
@@ -107,7 +135,7 @@ const trainingAllTimeFrame = async (req) => {
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        "and active=1 order by plandate desc limit 200";
+        "and active=1 order by plandate desc limit 400";
     }
     const result = await client.query(query);
     client.release();
@@ -541,7 +569,15 @@ const trainingReportAll = async (req) => {
 const trainingFinanceReport = async (req) => {
   const client = await pool.getConnection();
   try {
-    const { month, year } = req.query;
+    const {
+      month,
+      year,
+      amountreceiveddate,
+      bank,
+      invoicenumber,
+      cheque,
+      notnull,
+    } = req.query;
     let query = `SELECT YEAR(t.plandate) AS year
 	,MONTH(t.plandate) AS month
 	,t.plandate
@@ -566,6 +602,21 @@ FROM training t `;
     }
     if (year) {
       conditions.push(`YEAR(t.plandate) = ${year}`);
+    }
+    if (amountreceiveddate) {
+      conditions.push(`amountreceiveddate = '${amountreceiveddate}'`);
+    }
+    if (bank) {
+      conditions.push(`bank = '${bank}'`);
+    }
+    if (invoicenumber) {
+      conditions.push(`invoicenumber = '${invoicenumber}'`);
+    }
+    if (cheque) {
+      conditions.push(`cheque = '${cheque}'`);
+    }
+    if (notnull) {
+      conditions.push(`amountreceived is not null`);
     }
     if (conditions.length > 0) {
       query +=
@@ -599,4 +650,5 @@ module.exports = {
   trainingFinanceReport,
   trainingsCount,
   trainingCountReportClients,
+  trainingFindBySessionID,
 };

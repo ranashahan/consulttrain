@@ -298,6 +298,51 @@ const getTraining = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @description get training from ID
+ * @route GET /api/training/getst
+ * @access private
+ */
+const getTrainingBySessionID = asyncHandler(async (req, res) => {
+  try {
+    const result = await db.trainingFindBySessionID(req.query.sessionid);
+    if (!result.length > 0) {
+      return res.status(constants.UNPROCESSABLE).json({
+        message: `wrong query param (sessionid ${req.query.sessionid}) provided`,
+      });
+    }
+    let dataFromDatabase = result;
+    const formattedResponse = dataFromDatabase.map((item) => {
+      if (item.plandate) {
+        item.plandate = new Date(item.plandate).toLocaleDateString();
+      }
+      if (item.startdate) {
+        item.startdate = new Date(item.startdate).toLocaleDateString();
+      }
+      if (item.enddate) {
+        item.enddate = new Date(item.enddate).toLocaleDateString();
+      }
+      if (item.trainingexpiry) {
+        item.trainingexpiry = new Date(
+          item.trainingexpiry
+        ).toLocaleDateString();
+      }
+      if (item.invoicedate) {
+        item.invoicedate = new Date(item.invoicedate).toLocaleDateString();
+      }
+      if (item.amountreceiveddate) {
+        item.amountreceiveddate = new Date(
+          item.amountreceiveddate
+        ).toLocaleDateString();
+      }
+      return item;
+    });
+    return res.status(constants.SUCCESS).json(formattedResponse);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
  * @description update training against param id
  * @route PUT /api/training/:id
  * @access private
@@ -524,4 +569,5 @@ module.exports = {
   getTrainingFinanceReport,
   getTrainingsCount,
   getTrainingCountReportClients,
+  getTrainingBySessionID,
 };

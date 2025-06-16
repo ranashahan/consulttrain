@@ -16,6 +16,7 @@ const {
   getTrainingFinanceReport,
   getTrainingsCount,
   getTrainingCountReportClients,
+  getTrainingBySessionID,
 } = require("../controllers/trainingController");
 const { constants } = require("../constants");
 
@@ -65,6 +66,13 @@ router
     ensureAuthenticated,
     roleAuthorize(constants.BILLMANAGERS),
     getTrainingFinanceReport
+  );
+router
+  .route("/getst")
+  .get(
+    ensureAuthenticated,
+    roleAuthorize(constants.ALLROLES),
+    getTrainingBySessionID
   );
 router
   .route("/:id")

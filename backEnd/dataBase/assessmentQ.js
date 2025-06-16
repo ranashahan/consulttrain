@@ -84,7 +84,9 @@ const sessionAllTimeFrame = async (req) => {
       endDate,
     } = req.query;
 
-    let query = `SELECT s.id, s.name, s.sessiondate,d.id as driverid, d.name as drivername, d.nic, c.id as contractorid, s.titleid, s.locationid, s.resultid, s.stageid, s.totalscore  
+    let query = `SELECT s.id, s.name, s.sessiondate,d.id as driverid, d.name as drivername, 
+    d.nic, d.permitnumber, d.permitissue, d.permitexpiry, c.id as contractorid, s.titleid, s.locationid, 
+    s.resultid, s.stageid, s.totalscore  
     FROM session s 
     join session_driver sd on sd.session_id = s.id 
     join driver d on sd.driver_id = d.id 
@@ -121,7 +123,7 @@ const sessionAllTimeFrame = async (req) => {
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        "and s.active=1 order by s.sessiondate desc limit 200";
+        "and s.active=1 order by s.sessiondate desc limit 400";
     }
 
     const result = await client.query(query);
