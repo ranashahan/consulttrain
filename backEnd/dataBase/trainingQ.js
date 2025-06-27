@@ -622,7 +622,7 @@ FROM training t `;
       query +=
         " WHERE " +
         conditions.join(" AND ") +
-        " AND t.active = 1 ORDER BY MONTH(plandate); ";
+        " AND t.active = 1 ORDER BY MONTH(plandate), plandate; ";
     } else {
       client.release();
       return Error("Cannot divide by zero");

@@ -7,6 +7,7 @@ const fs = require("fs");
 const rfs = require("rotating-file-stream");
 const path = require("path");
 const dotenv = require("dotenv");
+const rateLimit = require("express-rate-limit");
 dotenv.config();
 
 const getLogFilename = () => {
@@ -41,6 +42,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 //app.options("*", cors());
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+// Apply to all requests or specific routes
+app.use(apiLimiter);
 app.use(bodyParser.json());
 app.use(express.json());
 
