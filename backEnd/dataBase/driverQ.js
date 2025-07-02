@@ -224,6 +224,7 @@ const driverUpdateByID = async (
   name,
   gender,
   dob,
+  mobile,
   nic,
   nicexpiry,
   licensenumber,
@@ -246,7 +247,7 @@ const driverUpdateByID = async (
   userid,
   id
 ) => {
-  const query = `UPDATE driver SET name=?, gender=?, dob=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?,
+  const query = `UPDATE driver SET name=?, gender=?, dob=?,mobile=?, nic=?, nicexpiry=?, licensenumber=?, licensetypeid=?, licenseexpiry=?,
   licenseverified=?,designation=?, department=?, permitnumber=?, permitissue=?, permitexpiry=?, medicalexpiry=?, bloodgroupid=?, contractorid=?, 
     visualid=?, ddccount=?, experience=?, code=?, comment=?, modifiedby=? where id=?`;
   const client = await pool.getConnection();
@@ -255,6 +256,7 @@ const driverUpdateByID = async (
       name,
       gender,
       dob || null,
+      mobile,
       nic,
       nicexpiry || null,
       licensenumber,
@@ -328,6 +330,7 @@ const driversAll = async () => {
  * @param {string} name driver name
  * @param {string} gender driver gender
  * @param {Date} dob driver date of birth
+ * @param {string} mobile driver mobile
  * @param {string} nic driver NIC number
  * @param {string} nicexpiry driver NIC expiry
  * @param {string} licensenumber driver license number
@@ -350,6 +353,7 @@ const driverCreate = async (
   name,
   gender,
   dob,
+  mobile,
   nic,
   nicexpiry,
   licensenumber,
@@ -372,7 +376,7 @@ const driverCreate = async (
   userid
 ) => {
   const query =
-    "CALL `consulttrain`.`insert_driver`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "CALL `consulttrain`.`insert_driver`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   // const query = `INSERT INTO driver (name,gender,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
   //   department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
   //   code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
@@ -382,6 +386,7 @@ const driverCreate = async (
       name,
       gender,
       dob,
+      mobile,
       nic,
       nicexpiry,
       licensenumber,
