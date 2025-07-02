@@ -13,6 +13,7 @@ const createDriver = asyncHandler(async (req, res) => {
       name,
       gender,
       dob,
+      mobile,
       nic,
       nicexpiry,
       licensenumber,
@@ -47,7 +48,6 @@ const createDriver = asyncHandler(async (req, res) => {
         .status(constants.CONFLICT)
         .json({ message: "NIC number already existed with " + nic });
     }
-
     if (licensenumber) {
       const [driverLicenseNumber] = await db.driverFindByLicense(licensenumber);
       if (driverLicenseNumber) {
@@ -69,6 +69,7 @@ const createDriver = asyncHandler(async (req, res) => {
       name,
       gender,
       dob,
+      mobile,
       nic,
       nicexpiry,
       licensenumber,
@@ -328,6 +329,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       name,
       gender,
       dob,
+      mobile,
       nic,
       nicexpiry,
       licensenumber,
@@ -404,6 +406,7 @@ const updateDriver = asyncHandler(async (req, res) => {
       name,
       gender,
       dob,
+      mobile,
       nic,
       nicexpiry,
       licensenumber,
