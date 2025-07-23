@@ -24,7 +24,7 @@ const driverFindByName = async (name) => {
  * @returns {result} result
  */
 const driverFindByNIC = async (nic) => {
-  const query = "CALL `consulttrain`.`getDriverByNIC`(?);";
+  const query = `CALL ${process.env.DATABASE}.getDriverByNIC(?);`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [nic]);
@@ -138,7 +138,7 @@ const driverFindByPermit = async (permit) => {
  */
 const driverFindByID = async (id) => {
   // const query = "select * from driver where id=? and active=1 limit 1";
-  const query = "CALL `consulttrain`.`getDriverByID`(?);";
+  const query = `CALL ${process.env.DATABASE}.getDriverByID(?);`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [id]);
@@ -311,7 +311,7 @@ const driverDeleteByID = async (id) => {
  * @returns {result} result
  */
 const driversAll = async () => {
-  const query = "CALL `consulttrain`.`getAllDrivers`();";
+  const query = `CALL ${process.env.DATABASE}.getAllDrivers();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
@@ -375,8 +375,7 @@ const driverCreate = async (
   comment,
   userid
 ) => {
-  const query =
-    "CALL `consulttrain`.`insert_driver`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  const query = `CALL ${process.env.DATABASE}.insert_driver(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
   // const query = `INSERT INTO driver (name,gender,dob,nic,nicexpiry,licensenumber,licensetypeid,licenseexpiry,licenseverified,designation,
   //   department,permitnumber,permitissue,permitexpiry,bloodgroupid,contractorid,visualid,ddccount,experience,
   //   code,comment,createdby,modifiedby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
@@ -423,7 +422,7 @@ const driverCreate = async (
  * @returns {result} result
  */
 const driversExpiryReport = async (param) => {
-  const query = "CALL `consulttrain`.`getAllExpireDriver`(?);";
+  const query = `CALL ${process.env.DATABASE}.getAllExpireDriver(?);`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [param]);

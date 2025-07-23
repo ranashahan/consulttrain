@@ -43,9 +43,9 @@ const trainingFindByID = async (id) => {
  * @returns {result} result
  */
 const trainingFindBySessionID = async (id) => {
-  const query = `SELECT T.* FROM TRAINING T 
-  LEFT JOIN TRAINING_SESSION TS ON T.ID = TS.TRAINING_ID 
-  WHERE TS.SESSION_ID = ? AND T.ACTIVE=1;`;
+  const query = `SELECT T.* FROM training T 
+  LEFT JOIN training_session TS ON T.ID = TS.training_id 
+  WHERE TS.session_id = ? AND T.ACTIVE=1;`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [id]);
@@ -63,7 +63,7 @@ const trainingFindBySessionID = async (id) => {
  * @returns {result} result
  */
 const trainingID = async (id) => {
-  const query = "CALL `consulttrain`.`getTrainingByID`(?);";
+  const query = `CALL ${process.env.DATABASE}.getTrainingByID(?);`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query, [id]);
@@ -298,7 +298,7 @@ const trainingDeleteByID = async (id) => {
  * @returns {result} result
  */
 const trainingAll = async () => {
-  const query = "CALL `consulttrain`.`getAllTrainings`();";
+  const query = `CALL ${process.env.DATABASE}.getAllTrainings();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

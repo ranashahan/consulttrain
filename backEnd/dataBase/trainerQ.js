@@ -118,7 +118,7 @@ const trainerDeleteByID = async (userid, id) => {
  * @returns {result} result
  */
 const trainerAll = async () => {
-  const query = "CALL `consulttrain`.`getAllTrainers`();";
+  const query = `CALL ${process.env.DATABASE}.getAllTrainers();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

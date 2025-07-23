@@ -83,7 +83,7 @@ const resultDeleteByID = async (id) => {
  * @returns {result} result
  */
 const resultAll = async () => {
-  const query = "CALL `consulttrain`.`getAllResults`();";
+  const query = `CALL ${process.env.DATABASE}.getAllResults();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

@@ -84,7 +84,7 @@ const visualDeleteByID = async (id) => {
  * @returns {visual} visual
  */
 const visualAll = async () => {
-  const query = "CALL `consulttrain`.`getAllVisuals`();";
+  const query = `CALL ${process.env.DATABASE}.getAllVisuals();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

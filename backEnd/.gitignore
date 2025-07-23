@@ -48,3 +48,7 @@ _consult-train/*
 
 #accesslog
 log/*
+
+# Ignore all .env files
+.env
+.env.*   # ignores .env.production, .env.staging, etc.

@@ -1,0 +1,17 @@
+runtime: nodejs22
+entrypoint: npm start
+env_variables:
+  NODE_ENV: "production"
+  DATABASE: "consulttrain-465705" # This is your App Engine project ID, not DB name
+  # --- Add these for database connection ---
+  DB_USER: "angular" # Your Cloud SQL database user (e.g., 'app_user')
+  DB_PASS: "password" # The password for app_user
+  DB_NAME: "consulttrain" # The name of the database you created in Cloud SQL
+  # This is the Cloud SQL instance connection name: PROJECT_ID:REGION:INSTANCE_ID
+  INSTANCE_CONNECTION_NAME: "consulttrain-465705:us-central1:cnt"
+  RECAPTCHA_SECRET_KEY: "6Lc_SaYqAAAAAPFQHhOX-vgIzxYvBsbsEL5dnK91"
+  # --- End database connection variables ---
+
+# --- Add this for Cloud SQL integration (important for standard environment) ---
+beta_settings:
+  cloud_sql_instances: consulttrain-465705:us-central1:cnt

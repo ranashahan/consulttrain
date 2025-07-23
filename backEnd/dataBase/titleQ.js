@@ -84,7 +84,7 @@ const titleDeleteByID = async (id) => {
  * @returns {title} title
  */
 const titleAll = async () => {
-  const query = "CALL `consulttrain`.`getAllTitles`();";
+  const query = `CALL ${process.env.DATABASE}.getAllTitles();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

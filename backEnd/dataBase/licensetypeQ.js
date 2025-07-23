@@ -84,7 +84,7 @@ const dlTypeDeleteByID = async (id) => {
  * @returns {result} result
  */
 const dlTypeAll = async () => {
-  const query = "CALL `consulttrain`.`getAllLicenseTypes`();";
+  const query = `CALL ${process.env.DATABASE}.getAllLicenseTypes();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

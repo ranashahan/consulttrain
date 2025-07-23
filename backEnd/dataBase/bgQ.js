@@ -84,7 +84,7 @@ const bgDeleteByID = async (id) => {
  * @returns {result} result
  */
 const bgAll = async () => {
-  const query = "CALL `consulttrain`.`getAllBloodGroup`();";
+  const query = `CALL ${process.env.DATABASE}.getAllBloodGroup();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
