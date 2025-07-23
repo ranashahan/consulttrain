@@ -88,17 +88,9 @@ const sessionWebSite = async (req) => {
     LEFT JOIN title ti on s.titleid = ti.id 
     LEFT JOIN location l on s.locationid = l.id 
     LEFT JOIN result r on s.resultid = r.id 
-    LEFT JOIN stage stage on s.stageid = stage.id `;
-    const conditions = [];
-    if (nic) {
-      conditions.push(`d.nic LIKE '%${nic}%'`);
-    }
-    if (conditions.length > 0) {
-      query +=
-        " WHERE " +
-        conditions.join(" AND ") +
-        "AND s.active=1 order by s.sessiondate desc limit 10";
-    }
+    LEFT JOIN stage stage on s.stageid = stage.id 
+    WHERE d.nic = '${nic}' AND s.active=1 order by s.sessiondate desc limit 40`;
+
     const result = await client.query(query);
     client.release();
     return result[0];
