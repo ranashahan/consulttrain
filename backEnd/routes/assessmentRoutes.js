@@ -19,8 +19,11 @@ const {
   getSessionReportAll,
   getSessionsAll,
   getSessionCountReportForms,
+  getSessionByDateWebsite,
 } = require("../controllers/assessmentController");
 const { constants } = require("../constants");
+
+router.route("/website").get(getSessionByDateWebsite);
 
 router
   .route("/create")

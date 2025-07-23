@@ -277,6 +277,25 @@ const getSessionByDate = asyncHandler(async (req, res) => {
 
 /**
  * @description get all the assessments
+ * @route GET /api/assessment/website
+ * @access public
+ */
+const getSessionByDateWebsite = asyncHandler(async (req, res) => {
+  try {
+    const results = await db.sessionWebSite(req);
+    if (!results.length > 0) {
+      return res.status(constants.NOCONTENT).json({
+        message: `Could not found any result`,
+      });
+    }
+    return res.status(constants.SUCCESS).json(results);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
+/**
+ * @description get all the assessments
  * @route GET /api/assessment/getReportByDate
  * @access private
  */
@@ -587,4 +606,5 @@ module.exports = {
   getSessionReportAll,
   getSessionsAll,
   getSessionCountReportForms,
+  getSessionByDateWebsite,
 };

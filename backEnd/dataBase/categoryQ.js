@@ -84,7 +84,7 @@ const categoryDeleteByID = async (id) => {
  * @returns {result} result
  */
 const categoryAll = async () => {
-  const query = "CALL `consulttrain`.`getAllCategories`();";
+  const query = `CALL ${process.env.DATABASE}.getAllCategories();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

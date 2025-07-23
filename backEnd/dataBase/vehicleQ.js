@@ -84,7 +84,7 @@ const vehicleDeleteByID = async (id) => {
  * @returns {vehicle} vehicle
  */
 const vehicleAll = async () => {
-  const query = "CALL `consulttrain`.`getAllVehicles`();";
+  const query = `CALL ${process.env.DATABASE}.getAllVehicles();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

@@ -89,7 +89,7 @@ const industriesDeleteByID = async (id) => {
  * @returns {result} result
  */
 const industriesAll = async () => {
-  const query = "CALL `consulttrain`.`getAllIndustries`();";
+  const query = `CALL ${process.env.DATABASE}.getAllIndustries();`;
   const industries = await pool.getConnection();
   try {
     const result = await industries.query(query);

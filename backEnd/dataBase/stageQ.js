@@ -84,7 +84,7 @@ const stageDeleteByID = async (id) => {
  * @returns {stage} stage
  */
 const stageAll = async () => {
-  const query = "CALL `consulttrain`.`getAllStages`();";
+  const query = `CALL ${process.env.DATABASE}.getAllStages();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

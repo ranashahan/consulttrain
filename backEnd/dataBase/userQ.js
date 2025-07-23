@@ -168,8 +168,7 @@ const userDeleteByID = async (id) => {
  * @returns {result} result
  */
 const allUsers = async () => {
-  const query = `SELECT userid, username, email, name, mobile, company, designation, imagepath, role 
-  FROM consulttrain.users where active=1`;
+  const query = `CALL ${process.env.DATABASE}.getAllUsers();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

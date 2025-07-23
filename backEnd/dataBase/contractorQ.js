@@ -118,7 +118,7 @@ const contractorDeleteByID = async (id) => {
  * @returns {result} result
  */
 const contractorAll = async () => {
-  const query = "CALL `consulttrain`.`getAllContractors`();";
+  const query = `CALL ${process.env.DATABASE}.getAllContractors();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

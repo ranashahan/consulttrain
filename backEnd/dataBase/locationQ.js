@@ -84,7 +84,7 @@ const locationDeleteByID = async (id) => {
  * @returns {result} result
  */
 const locationAll = async () => {
-  const query = "CALL `consulttrain`.`getAllLocations`();";
+  const query = `CALL ${process.env.DATABASE}.getAllLocations();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);

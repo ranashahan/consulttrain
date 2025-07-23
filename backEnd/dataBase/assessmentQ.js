@@ -69,6 +69,44 @@ const sessionCountReportForms = async () => {
  * @param {string} req request
  * @returns {result} result
  */
+const sessionWebSite = async (req) => {
+  const client = await pool.getConnection();
+  try {
+    const { nic } = req.query;
+
+    let query = `SELECT s.id, s.name as 'Certificate #', s.sessiondate as AssessmentDate,d.id as Driverid, d.name as DriverName, 
+    d.nic as 'N.I.C.#', d.permitnumber as 'Permit#', d.permitissue as PermitIssue, 
+    d.permitexpiry as PermitExpiry, c.name as Contractor, t.name as Trainer, ti.description as CourseTitle, l.name as Location,
+    r.name as Result, stage.name as Stage, s.totalscore
+    FROM session s
+    join session_driver sd on sd.session_id = s.id
+    join driver d on sd.driver_id = d.id
+    LEFT JOIN session_contractor sc on sc.session_id = s.id
+    LEFT JOIN contractor c on sc.contractor_id = c.id 
+    LEFT JOIN session_trainer st on st.session_id = s.id
+    LEFT JOIN trainer t on st.trainer_id = t.id
+    LEFT JOIN title ti on s.titleid = ti.id 
+    LEFT JOIN location l on s.locationid = l.id 
+    LEFT JOIN result r on s.resultid = r.id 
+    LEFT JOIN stage stage on s.stageid = stage.id 
+    WHERE d.nic = '${nic}' AND s.active=1 order by s.sessiondate desc limit 40`;
+
+    const result = await client.query(query);
+    client.release();
+    return result[0];
+  } catch (error) {
+    client.release();
+    console.error(
+      "error occurred while session All Time Frame search: " + error
+    );
+    return error;
+  }
+};
+/**
+ * This method for search query
+ * @param {string} req request
+ * @returns {result} result
+ */
 const sessionAllTimeFrame = async (req) => {
   const client = await pool.getConnection();
   try {
@@ -85,13 +123,13 @@ const sessionAllTimeFrame = async (req) => {
     } = req.query;
 
     let query = `SELECT s.id, s.name, s.sessiondate,d.id as driverid, d.name as drivername, 
-    d.nic, d.permitnumber, d.permitissue, d.permitexpiry, c.id as contractorid, s.titleid, s.locationid, 
-    s.resultid, s.stageid, s.totalscore  
+    d.nic, d.permitnumber, d.permitissue, d.permitexpiry, sc.contractor_id as contractorid, st.trainer_id as trainerid, s.titleid, s.locationid, 
+    s.resultid, s.stageid, s.totalscore 
     FROM session s 
     join session_driver sd on sd.session_id = s.id 
     join driver d on sd.driver_id = d.id 
     LEFT JOIN session_contractor sc on sc.session_id = s.id
-    LEFT JOIN contractor c on sc.contractor_id = c.id`;
+    LEFT JOIN session_trainer st on st.session_id = s.id`;
     const conditions = [];
     if (nic) {
       conditions.push(`d.nic LIKE '%${nic}%'`);
@@ -125,7 +163,6 @@ const sessionAllTimeFrame = async (req) => {
         conditions.join(" AND ") +
         "and s.active=1 order by s.sessiondate desc limit 400";
     }
-
     const result = await client.query(query);
     client.release();
     return result[0];
@@ -360,7 +397,7 @@ ORDER BY
  * @returns {result} result
  */
 const sessionAll = async () => {
-  const query = "CALL `consulttrain`.`getAllSessions`();";
+  const query = `CALL ${process.env.DATABASE}.getAllSessions();`;
   const client = await pool.getConnection();
   try {
     const result = await client.query(query);
@@ -653,4 +690,5 @@ module.exports = {
   sessionReportAll,
   sessionAll,
   sessionCountReportForms,
+  sessionWebSite,
 };
