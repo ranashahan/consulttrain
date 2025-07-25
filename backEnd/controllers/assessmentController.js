@@ -308,8 +308,16 @@ const getSessionReportByDate = asyncHandler(async (req, res) => {
       });
     }
 
-    let dataFromDatabase = results;
-    const formattedResponse = dataFromDatabase.map((item) => {
+    const formattedResponse = results.map((item) => {
+      // Parse assessments
+      if (typeof item.assessments === "string") {
+        try {
+          item.assessments = JSON.parse(item.assessments);
+        } catch (err) {
+          console.error("Error parsing assessments:", err);
+          item.assessments = [];
+        }
+      }
       if (item.sessiondate) {
         item.sessiondate = new Date(item.sessiondate).toLocaleDateString();
       }
@@ -406,7 +414,7 @@ const getSessionReportAll = asyncHandler(async (req, res) => {
   try {
     const results = await db.sessionReportAll(req);
     if (!results.length > 0) {
-      return res.status(204).json({
+      return res.status(constants.NOCONTENT).json({
         message: `Could not found any result`,
       });
     }
@@ -470,8 +478,16 @@ const getSession = asyncHandler(async (req, res) => {
       });
     }
 
-    let dataFromDatabase = result;
-    const formattedResponse = dataFromDatabase.map((item) => {
+    const formattedResponse = result.map((item) => {
+      // Parse assessments
+      if (typeof item.assessments === "string") {
+        try {
+          item.assessments = JSON.parse(item.assessments);
+        } catch (err) {
+          console.error("Error parsing assessments:", err);
+          item.assessments = [];
+        }
+      }
       if (item.sessiondate) {
         item.sessiondate = new Date(item.sessiondate).toLocaleDateString();
       }
