@@ -435,6 +435,24 @@ const driversExpiryReport = async (param) => {
   }
 };
 
+/**
+ * This method for fetch all the driver count.
+ * @returns {result} result
+ */
+const driversCount = async () => {
+  const query = "select count(id) as totalDriver from driver";
+  const client = await pool.getConnection();
+  try {
+    const result = await client.query(query);
+    client.release();
+    return result[0][0].totalDriver ?? 0;
+  } catch (error) {
+    client.release();
+    console.error("error occurred while all drivers count: " + error);
+    return error;
+  }
+};
+
 module.exports = {
   driverCreate,
   driversAll,
@@ -449,4 +467,5 @@ module.exports = {
   driversExpiryReport,
   driverSessionByID,
   driverFindByPermit,
+  driversCount,
 };

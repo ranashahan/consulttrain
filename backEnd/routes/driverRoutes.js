@@ -15,6 +15,7 @@ const {
   createDriver,
   getDriverExpiry,
   getDriverSession,
+  getDriversCount,
 } = require("../controllers/driverController");
 const {
   getDashboardDriverCounts,
@@ -32,6 +33,9 @@ router
     roleAuthorize(constants.ALLROLES),
     getDrivers
   );
+router
+  .route("/getCount")
+  .get(ensureAuthenticated, roleAuthorize(constants.ALLROLES), getDriversCount);
 router
   .route("/nic")
   .get(ensureAuthenticated, roleAuthorize(constants.ALLROLES), getDriverByNIC);
