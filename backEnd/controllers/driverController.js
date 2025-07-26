@@ -530,6 +530,21 @@ const getDriverExpiry = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @description get all the Drivers count
+ * @route GET /api/driver/getCount
+ * @access private
+ */
+const getDriversCount = asyncHandler(async (req, res) => {
+  try {
+    const result = await db.driversCount();
+
+    return res.status(constants.SUCCESS).json(result);
+  } catch (error) {
+    res.status(constants.SERVER_ERROR);
+  }
+});
+
 module.exports = {
   getDriverExpiry,
   deleteDriver,
@@ -540,4 +555,5 @@ module.exports = {
   getDrivers,
   createDriver,
   getDriverSession,
+  getDriversCount,
 };

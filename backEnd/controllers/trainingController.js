@@ -150,7 +150,7 @@ const getTrainings = asyncHandler(async (req, res) => {
 
 /**
  * @description get all the trainings
- * @route GET /api/training/getAll
+ * @route GET /api/training/getCount
  * @access private
  */
 const getTrainingsCount = asyncHandler(async (req, res) => {
